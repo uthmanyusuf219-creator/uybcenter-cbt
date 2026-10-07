@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>UYB Center CBT</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1117;--surf:#181c27;--surf2:#1e2438;--border:#2a3050;
+  --accent:#4f7cff;--accent2:#7c5cfc;--green:#22c55e;--red:#ef4444;
+  --yellow:#f59e0b;--text:#e8eaf0;--muted:#7a84a0;--r:12px
+}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+h1,h2,h3{font-weight:700}
+.screen{display:none;min-height:100vh;flex-direction:column}
+.screen.active{display:flex}
+
+/* BUTTONS */
+.btn{padding:.7rem 1.6rem;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer;border:none;transition:opacity .15s,transform .1s;font-family:inherit}
+.btn:active{transform:scale(.97)}
+.btn:hover{opacity:.85}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+.btn-danger{background:var(--red);color:#fff}
+.btn-success{background:var(--green);color:#fff}
+.btn-sm{padding:.45rem 1rem;font-size:.82rem}
+.btn-block{width:100%;margin-top:.5rem}
+
+/* INPUTS */
+.field{margin-bottom:1.1rem}
+.field label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:.35rem;font-weight:500}
+input[type=text],input[type=password],input[type=number],select,textarea{
+  width:100%;background:var(--surf2);border:1.5px solid var(--border);border-radius:8px;
+  padding:.6rem .85rem;color:var(--text);font-size:.92rem;font-family:inherit;outline:none;transition:border-color .15s
+}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+textarea{resize:vertical;min-height:90px}
+
+/* PANEL */
+.panel{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:1.8rem}
+
+/* TOPBAR */
+.topbar{background:var(--surf);border-bottom:1px solid var(--border);padding:.9rem 1.4rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;position:sticky;top:0;z-index:100}
+.topbar-title{font-size:1rem;font-weight:700}
+
+/* LANDING */
+#landing{align-items:center;justify-content:center;background:radial-gradient(ellipse at 60% 0%,#1a2060 0%,var(--bg) 60%)}
+.logo{font-size:2.2rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.3rem}
+.tagline{color:var(--muted);font-size:.9rem;margin-bottom:2.2rem}
+.btn-row{display:flex;gap:.9rem;justify-content:center;flex-wrap:wrap}
+
+/* CARDS */
+.card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:1.2rem 1.4rem;margin-bottom:.75rem}
+.card-row{display:flex;align-items:center;justify-content:space-between;gap:.8rem;flex-wrap:wrap}
+.card-actions{display:flex;gap:.45rem;flex-wrap:wrap}
+.card h3{font-size:.95rem;margin-bottom:.2rem}
+.card span{font-size:.78rem;color:var(--muted)}
+
+/* SECTION LABEL */
+.sec{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:1.6rem 0 .8rem}
+
+/* UPLOAD ZONE */
+.upload-zone{border:2px dashed var(--border);border-radius:var(--r);padding:2rem;text-align:center;cursor:pointer;transition:border-color .2s,background .2s}
+.upload-zone:hover{border-color:var(--accent);background:#131829}
+.upload-zone .uz-icon{font-size:2rem;margin-bottom:.4rem}
+.upload-zone p{color:var(--muted);font-size:.82rem;margin-top:.3rem}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;align-items:center;justify-content:center;padding:1rem}
+.modal-bg.show{display:flex}
+.modal{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:1.8rem;width:100%;max-width:500px;max-height:90vh;overflow-y:auto}
+.modal h2{margin-bottom:1.3rem;font-size:1.2rem}
+.modal-footer{display:flex;gap:.7rem;justify-content:flex-end;margin-top:1.2rem}
+
+/* EXAM SCREEN */
+.exam-header{background:var(--surf);border-bottom:1px solid var(--border);padding:.85rem 1.4rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;position:sticky;top:0;z-index:100}
+.timer{font-size:1.3rem;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+.timer.warn{color:var(--yellow)}
+.timer.crit{color:var(--red);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+.exam-body{flex:1;padding:1.2rem;max-width:700px;width:100%;margin:0 auto}
+
+/* QUESTION BLOCK */
+.q-block{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:1.4rem;margin-bottom:1.2rem}
+.q-num{font-size:.72rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.45rem}
+.q-text{font-size:.97rem;line-height:1.6;margin-bottom:1.1rem}
+.opt-list{list-style:none;display:flex;flex-direction:column;gap:.55rem}
+.opt{display:flex;align-items:center;gap:.75rem;background:var(--surf2);border:1.5px solid var(--border);border-radius:8px;padding:.7rem .95rem;cursor:pointer;transition:border-color .15s,background .15s;user-select:none}
+.opt:hover{border-color:var(--accent);background:#1a2240}
+.opt.sel{border-color:var(--accent);background:#1a2240}
+.opt.correct{border-color:var(--green);background:#0d2e1a}
+.opt.wrong{border-color:var(--red);background:#2e0d0d}
+.opt-lbl{width:26px;height:26px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;flex-shrink:0}
+.sel .opt-lbl{background:var(--accent);color:#fff}
+.correct .opt-lbl{background:var(--green);color:#fff}
+.wrong .opt-lbl{background:var(--red);color:#fff}
+
+/* Q NAV DOTS */
+.q-nav{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:1rem}
+.q-dot{width:30px;height:30px;border-radius:6px;background:var(--surf2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.72rem;cursor:pointer;font-weight:600;transition:background .15s,border-color .15s}
+.q-dot.ans{background:var(--accent);border-color:var(--accent);color:#fff}
+.q-dot.cur{border-color:var(--accent2);box-shadow:0 0 0 2px rgba(124,92,252,.3)}
+
+/* STICKY BOTTOM NAV */
+.sticky-nav{position:sticky;bottom:0;background:var(--bg);border-top:1px solid var(--border);padding:.9rem 1.4rem;display:flex;justify-content:space-between;align-items:center}
+
+/* PROGRESS */
+.prog-wrap{background:var(--surf2);border-radius:99px;height:4px;width:100px;overflow:hidden}
+.prog-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px;transition:width .3s}
+
+/* CHEAT OVERLAY */
+.cheat-ol{display:none;position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:9999;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:2rem}
+.cheat-ol.show{display:flex}
+.cheat-ol .ci{font-size:3rem;margin-bottom:.9rem}
+.cheat-ol h2{color:var(--red);margin-bottom:.5rem}
+.cheat-ol p{color:var(--muted);margin-bottom:1.4rem;max-width:360px;line-height:1.6}
+
+/* RESULTS */
+#results-screen{align-items:center;justify-content:center;padding:2rem}
+.result-box{max-width:480px;width:100%;text-align:center}
+.score-ring{width:120px;height:120px;border-radius:50%;margin:0 auto 1.3rem;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.score-ring .sp{font-size:1.9rem;font-weight:700}
+.score-ring .sl{font-size:.72rem;color:var(--muted)}
+.pass-ring{border:5px solid var(--green)}
+.fail-ring{border:5px solid var(--red)}
+.r-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin:1.3rem 0}
+.r-stat{background:var(--surf);border:1px solid var(--border);border-radius:8px;padding:.9rem}
+.r-stat .rv{font-size:1.3rem;font-weight:700}
+.r-stat .rl{font-size:.75rem;color:var(--muted);margin-top:.15rem}
+
+/* TOAST */
+.toast{position:fixed;bottom:1.4rem;right:1.4rem;background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:.7rem 1.1rem;font-size:.85rem;z-index:5000;opacity:0;transform:translateY(8px);transition:opacity .3s,transform .3s;max-width:260px;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.ok{border-color:var(--green);color:var(--green)}
+.toast.err{border-color:var(--red);color:var(--red)}
+
+/* RESULTS TABLE */
+.rtable{width:100%;border-collapse:collapse;font-size:.82rem}
+.rtable th{text-align:left;padding:.55rem .7rem;color:var(--muted);border-bottom:1px solid var(--border);font-weight:500}
+.rtable td{padding:.65rem .7rem;border-bottom:1px solid var(--border)}
+.cf{color:var(--red);font-size:.75rem}
+
+/* STUDENT ENTRY */
+#student-entry{align-items:center;justify-content:center}
+.exam-pick{background:var(--surf);border:1.5px solid var(--border);border-radius:var(--r);padding:1.1rem 1.4rem;margin-bottom:.7rem;cursor:pointer;transition:border-color .15s}
+.exam-pick:hover,.exam-pick.picked{border-color:var(--accent)}
+.exam-pick h3{font-size:.95rem;margin-bottom:.2rem}
+.exam-pick span{font-size:.78rem;color:var(--muted)}
+
+/* BADGE */
+.badge{display:inline-block;padding:.18rem .55rem;border-radius:20px;font-size:.72rem;font-weight:600}
+.b-blue{background:#1a2a5e;color:var(--accent)}
+.b-green{background:#0d2e1a;color:var(--green)}
+.b-red{background:#2e0d0d;color:var(--red)}
+
+/* PARSE STATUS */
+.parse-box{background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:.9rem;margin-top:.7rem;font-size:.83rem;display:none}
+
+/* ADMIN LOGIN */
+#admin-login{align-items:center;justify-content:center}
+.back-btn{position:fixed;top:1rem;left:1rem;z-index:200}
+
+/* DASH BODY */
+.dash-body{padding:1.4rem;max-width:860px;margin:0 auto;width:100%;flex:1}
+
+@media(max-width:520px){
+  .dash-body,.exam-body{padding:.9rem}
+  .topbar,.exam-header{padding:.75rem .9rem}
+  .r-grid{grid-template-columns:1fr 1fr}
+  .modal{padding:1.3rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ LANDING ═══ -->
+<div id="landing" class="screen active">
+  <div style="text-align:center;padding:2rem;margin:auto">
+    <div class="logo">UYB Center</div>
+    <p class="tagline">Computer Based Testing — Offline Ready</p>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="go('student-entry')">Take Exam</button>
+      <button class="btn btn-outline" onclick="go('admin-login')">Admin Panel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ADMIN LOGIN ═══ -->
+<div id="admin-login" class="screen">
+  <div class="back-btn"><button class="btn btn-outline btn-sm" onclick="go('landing')">← Back</button></div>
+  <div class="panel" style="width:100%;max-width:380px;margin:auto">
+    <h2 style="margin-bottom:1.3rem">Admin Login</h2>
+    <div class="field"><label>Username</label><input type="text" id="au" placeholder="admin"></div>
+    <div class="field"><label>Password</label><input type="password" id="ap" placeholder="••••••••" onkeydown="if(event.key==='Enter')adminLogin()"></div>
+    <div id="aerr" style="color:var(--red);font-size:.8rem;margin-bottom:.8rem;display:none">Wrong credentials.</div>
+    <button class="btn btn-primary btn-block" onclick="adminLogin()">Login</button>
+    <p style="font-size:.75rem;color:var(--muted);margin-top:.9rem;text-align:center">Default: admin / admin123</p>
+  </div>
+</div>
+
+<!-- ═══ ADMIN DASHBOARD ═══ -->
+<div id="admin-dash" class="screen">
+  <div class="topbar">
+    <span class="topbar-title">⚙ Admin — UYB Center</span>
+    <div style="display:flex;gap:.5rem">
+      <button class="btn btn-primary btn-sm" onclick="openModal('m-create')">+ New Exam</button>
+      <button class="btn btn-outline btn-sm" onclick="openChangePass()">Password</button>
+      <button class="btn btn-outline btn-sm" onclick="adminLogout()">Logout</button>
+    </div>
+  </div>
+  <div class="dash-body">
+    <p class="sec">Exams</p>
+    <div id="exam-list-admin"></div>
+    <p class="sec">Student Results</p>
+    <div id="results-admin" style="overflow-x:auto"></div>
+  </div>
+</div>
+
+<!-- ═══ STUDENT ENTRY ═══ -->
+<div id="student-entry" class="screen">
+  <div class="back-btn"><button class="btn btn-outline btn-sm" onclick="go('landing')">← Back</button></div>
+  <div style="width:100%;max-width:420px;margin:auto;padding:4rem 1rem 2rem">
+    <h2 style="margin-bottom:1.2rem;text-align:center">Select Exam</h2>
+    <div id="exam-pick-list"></div>
+    <div id="student-form" style="display:none;margin-top:1rem" class="panel">
+      <p style="font-weight:600;margin-bottom:1rem;font-size:.95rem" id="selected-exam-label"></p>
+      <div class="field"><label>Full Name</label><input type="text" id="sname" placeholder="e.g. Aminu Sule"></div>
+      <div class="field"><label>Matric / Reg Number</label><input type="text" id="smatric" placeholder="e.g. 2024/CSC/001"></div>
+      <div id="serr" style="color:var(--red);font-size:.8rem;margin-bottom:.6rem;display:none">Fill in all fields.</div>
+      <button class="btn btn-primary btn-block" onclick="startExam()">Start Exam →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ EXAM SCREEN ═══ -->
+<div id="exam-screen" class="screen">
+  <div class="exam-header">
+    <div>
+      <div style="font-weight:700;font-size:.95rem" id="etitle"></div>
+      <div style="font-size:.75rem;color:var(--muted)" id="ename"></div>
+    </div>
+    <div style="text-align:right">
+      <div class="timer" id="timer">--:--</div>
+      <div class="prog-wrap" style="margin-left:auto;margin-top:3px"><div class="prog-bar" id="prog" style="width:0%"></div></div>
+    </div>
+  </div>
+  <div class="exam-body" id="exam-body"></div>
+  <div class="sticky-nav">
+    <button class="btn btn-outline btn-sm" id="pbtn" onclick="navQ(-1)">← Prev</button>
+    <span style="font-size:.82rem;color:var(--muted)" id="qcount"></span>
+    <button class="btn btn-primary btn-sm" id="nbtn" onclick="navQ(1)">Next →</button>
+  </div>
+</div>
+
+<!-- ═══ RESULTS ═══ -->
+<div id="results-screen" class="screen">
+  <div class="result-box">
+    <h2 style="margin-bottom:.25rem" id="rname"></h2>
+    <p style="color:var(--muted);font-size:.82rem;margin-bottom:1.3rem" id="rexam"></p>
+    <div class="score-ring" id="sring"><span class="sp" id="rpct"></span><span class="sl">Score</span></div>
+    <div style="font-size:1.05rem;font-weight:700;margin-bottom:.9rem" id="rverdict"></div>
+    <div class="r-grid">
+      <div class="r-stat"><div class="rv" id="rc"></div><div class="rl">Correct</div></div>
+      <div class="r-stat"><div class="rv" id="rw"></div><div class="rl">Wrong</div></div>
+      <div class="r-stat"><div class="rv" id="rt"></div><div class="rl">Total</div></div>
+      <div class="r-stat"><div class="rv" id="rtime"></div><div class="rl">Time Used</div></div>
+    </div>
+    <div id="rcheat" style="display:none;color:var(--red);font-size:.82rem;background:#2e0d0d;border-radius:8px;padding:.75rem;margin-bottom:1rem;text-align:left"></div>
+    <button class="btn btn-outline btn-block" onclick="go('student-entry')">Take Another Exam</button>
+  </div>
+</div>
+
+<!-- ═══ CHEAT OVERLAY ═══ -->
+<div class="cheat-ol" id="cheat-ol">
+  <div class="ci">⚠️</div>
+  <h2>Suspicious Activity</h2>
+  <p id="cheat-msg">This action is not allowed during the exam. The incident has been logged.</p>
+  <button class="btn btn-danger" onclick="dismissCheat()">I Understand — Continue Exam</button>
+</div>
+
+<!-- ═══ TOAST ═══ -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══ MODALS ═══ -->
+
+<!-- Create Exam Modal -->
+<div class="modal-bg" id="m-create">
+  <div class="modal">
+    <h2>Create New Exam</h2>
+    <div class="field"><label>Subject / Exam Title</label><input type="text" id="etitle-in" placeholder="e.g. Mathematics — SS2 Mid-Term"></div>
+    <div class="field"><label>Duration (minutes)</label><input type="number" id="edur" value="30" min="1" max="300"></div>
+    <div class="field"><label>Pass Score (%)</label><input type="number" id="epass" value="50" min="1" max="100"></div>
+    <div class="field">
+      <label>Upload Questions (PDF or DOCX)</label>
+      <div class="upload-zone" id="uz" onclick="document.getElementById('file-in').click()">
+        <div class="uz-icon">📂</div>
+        <strong id="fname">Tap to choose file</strong>
+        <p>PDF or DOCX — numbered questions with A) B) C) D) options</p>
+      </div>
+      <input type="file" id="file-in" accept=".pdf,.docx,.doc" style="display:none" onchange="handleFile(this)">
+    </div>
+    <div class="parse-box" id="parse-status"></div>
+    <div id="q-preview"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('m-create')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveExam()">Save Exam</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Exam Modal -->
+<div class="modal-bg" id="m-edit">
+  <div class="modal">
+    <h2>Edit Exam Settings</h2>
+    <input type="hidden" id="edit-id">
+    <div class="field"><label>Title</label><input type="text" id="edit-title"></div>
+    <div class="field"><label>Duration (minutes)</label><input type="number" id="edit-dur" min="1" max="300"></div>
+    <div class="field"><label>Pass Score (%)</label><input type="number" id="edit-pass" min="1" max="100"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('m-edit')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Set Answers Modal -->
+<div class="modal-bg" id="m-answers">
+  <div class="modal">
+    <h2>Set Correct Answers</h2>
+    <p style="font-size:.8rem;color:var(--muted);margin-bottom:1rem">Tap the correct option for each question.</p>
+    <div id="ans-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('m-answers')">Close</button>
+      <button class="btn btn-primary" onclick="saveAnswers()">Save Answers</button>
+    </div>
+  </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal-bg" id="m-pass">
+  <div class="modal">
+    <h2>Change Admin Password</h2>
+    <div class="field"><label>Current Password</label><input type="password" id="cp-cur"></div>
+    <div class="field"><label>New Password</label><input type="password" id="cp-new"></div>
+    <div class="field"><label>Confirm New Password</label><input type="password" id="cp-con"></div>
+    <div id="cp-err" style="color:var(--red);font-size:.8rem;margin-bottom:.6rem;display:none"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('m-pass')">Cancel</button>
+      <button class="btn btn-primary" onclick="changePass()">Update Password</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let DB = JSON.parse(localStorage.getItem('cbt_db')||'{"exams":[],"results":[],"adminPass":"admin123"}');
+if(!DB.adminPass) DB.adminPass = 'admin123';
+
+let exam = null, student = {name:'',id:''}, answers = {}, curQ = 0;
+let timerInt = null, timeLeft = 0, timeUsed = 0, cheatCount = 0;
+let pendingQuestions = [], ansEditId = null, pickedExamId = null;
+
+function saveDB(){ localStorage.setItem('cbt_db', JSON.stringify(DB)); }
+
+// ═══════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id==='student-entry') renderStudentEntry();
+  if(id==='admin-dash') renderAdminDash();
+}
+
+function openModal(id){ document.getElementById(id).classList.add('show'); }
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+
+// ═══════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════
+function toast(msg, type=''){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show '+type;
+  setTimeout(()=>t.className='toast', 3000);
+}
+
+// ═══════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════
+function adminLogin(){
+  const u = document.getElementById('au').value.trim();
+  const p = document.getElementById('ap').value.trim();
+  const err = document.getElementById('aerr');
+  if(u==='admin' && p===DB.adminPass){
+    err.style.display='none'; go('admin-dash');
+  } else { err.style.display='block'; }
+}
+
+function adminLogout(){ go('landing'); }
+
+function openChangePass(){ closeModal('m-pass'); openModal('m-pass'); }
+
+function changePass(){
+  const cur = document.getElementById('cp-cur').value;
+  const nw = document.getElementById('cp-new').value;
+  const con = document.getElementById('cp-con').value;
+  const err = document.getElementById('cp-err');
+  if(cur !== DB.adminPass){ err.style.display='block'; err.textContent='Current password is wrong.'; return; }
+  if(nw.length < 4){ err.style.display='block'; err.textContent='New password must be at least 4 characters.'; return; }
+  if(nw !== con){ err.style.display='block'; err.textContent='Passwords do not match.'; return; }
+  DB.adminPass = nw; saveDB();
+  closeModal('m-pass');
+  toast('Password updated','ok');
+}
+
+// ═══════════════════════════════════════════
+// FILE HANDLING — PDF + DOCX PARSER
+// ═══════════════════════════════════════════
+async function handleFile(input){
+  const file = input.files[0];
+  if(!file) return;
+  document.getElementById('fname').textContent = file.name;
+  const status = document.getElementById('parse-status');
+  status.style.display='block';
+  status.style.color='var(--muted)';
+  status.textContent = 'Reading file...';
+  pendingQuestions = [];
+
+  try {
+    const ext = file.name.split('.').pop().toLowerCase();
+    let text = '';
+
+    if(ext === 'pdf'){
+      text = await readPDF(file);
+    } else if(ext === 'docx' || ext === 'doc'){
+      text = await readDOCX(file);
+    } else {
+      status.textContent = 'Unsupported file type. Use PDF or DOCX.';
+      status.style.color = 'var(--red)';
+      return;
+    }
+
+    pendingQuestions = parseQuestions(text);
+
+    if(pendingQuestions.length === 0){
+      status.textContent = '⚠ No questions found. Check format: numbered questions with A) B) C) D) options on separate lines.';
+      status.style.color = 'var(--yellow)';
+    } else {
+      status.textContent = `✓ Found ${pendingQuestions.length} question(s) — set correct answers after saving.`;
+      status.style.color = 'var(--green)';
+      renderQPreview();
+    }
+  } catch(e){
+    status.textContent = 'Error reading file: ' + e.message;
+    status.style.color = 'var(--red)';
+  }
+}
+
+// ─── PDF READER (pure JS, no library) ─────────────────────────────────────
+async function readPDF(file){
+  const buf = await file.arrayBuffer();
+  const bytes = new Uint8Array(buf);
+  let text = '';
+
+  // Decode PDF byte string to string
+  let raw = '';
+  for(let i=0; i<bytes.length; i++) raw += String.fromCharCode(bytes[i]);
+
+  // Extract all text from BT...ET blocks (PDF text streams)
+  const btBlocks = raw.match(/BT[\s\S]*?ET/g) || [];
+  for(const block of btBlocks){
+    // Extract strings inside parentheses: (text)
+    const paren = block.match(/\(([^)\\]|\\.)*\)/g) || [];
+    for(const p of paren){
+      let s = p.slice(1,-1);
+      // Decode common PDF escape sequences
+      s = s.replace(/\\n/g,'\n').replace(/\\r/g,'\n').replace(/\\t/g,' ')
+           .replace(/\\\(/g,'(').replace(/\\\)/g,')').replace(/\\\\/g,'\\');
+      // Decode octal escapes e.g. \101 = A
+      s = s.replace(/\\([0-7]{3})/g,(_,o)=>String.fromCharCode(parseInt(o,8)));
+      text += s + ' ';
+    }
+    // Also extract hex strings <hex>
+    const hex = block.match(/<[0-9a-fA-F]+>/g) || [];
+    for(const h of hex){
+      const hx = h.slice(1,-1);
+      let hs = '';
+      for(let i=0; i<hx.length; i+=2) hs += String.fromCharCode(parseInt(hx.slice(i,i+2),16));
+      text += hs + ' ';
+    }
+    text += '\n';
+  }
+
+  // If BT/ET extraction got nothing, try extracting all parenthesised strings from streams
+  if(text.trim().length < 20){
+    const streamRe = /stream\r?\n([\s\S]*?)endstream/g;
+    let m;
+    while((m=streamRe.exec(raw))!==null){
+      const s = m[1];
+      const ps = s.match(/\(([^)\\]|\\.)*\)/g)||[];
+      for(const p of ps){
+        let t = p.slice(1,-1)
+          .replace(/\\n/g,'\n').replace(/\\r/g,'\n').replace(/\\t/g,' ')
+          .replace(/\\\(/g,'(').replace(/\\\)/g,')').replace(/\\\\/g,'\\')
+          .replace(/\\([0-7]{3})/g,(_,o)=>String.fromCharCode(parseInt(o,8)));
+        text += t + ' ';
+      }
+    }
+  }
+
+  return text;
+}
+
+// ─── DOCX READER (pure JS — reads XML inside ZIP) ─────────────────────────
+async function readDOCX(file){
+  const buf = await file.arrayBuffer();
+  const bytes = new Uint8Array(buf);
+
+  // DOCX is a ZIP file. Find word/document.xml inside it
+  const xmlContent = extractFileFromZip(bytes, 'word/document.xml');
+  if(!xmlContent) throw new Error('Could not read DOCX structure.');
+
+  // Strip XML tags, decode entities
+  let text = xmlContent
+    .replace(/<w:br[^>]*>/gi, '\n')
+    .replace(/<w:p[ >][^>]*>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')
+    .replace(/&quot;/g,'"').replace(/&#([0-9]+);/g,(_,n)=>String.fromCharCode(n))
+    .replace(/&#x([0-9a-fA-F]+);/g,(_,h)=>String.fromCharCode(parseInt(h,16)));
+
+  return text;
+}
+
+function extractFileFromZip(bytes, targetPath){
+  // ZIP local file header signature: PK\x03\x04
+  const sig = [0x50,0x4B,0x03,0x04];
+  let i = 0;
+
+  while(i < bytes.length - 30){
+    // Find next local file header
+    if(bytes[i]===sig[0]&&bytes[i+1]===sig[1]&&bytes[i+2]===sig[2]&&bytes[i+3]===sig[3]){
+      const fnLen = bytes[i+26] | (bytes[i+27]<<8);
+      const extraLen = bytes[i+28] | (bytes[i+29]<<8);
+      let fname = '';
+      for(let j=0;j<fnLen;j++) fname += String.fromCharCode(bytes[i+30+j]);
+
+      const dataOffset = i + 30 + fnLen + extraLen;
+      const compSize = bytes[i+18]|(bytes[i+19]<<8)|(bytes[i+20]<<16)|(bytes[i+21]<<24);
+      const method = bytes[i+8]|(bytes[i+9]<<8);
+
+      if(fname === targetPath){
+        const compData = bytes.slice(dataOffset, dataOffset+compSize);
+        if(method === 0){
+          // Stored (no compression)
+          let s = '';
+          for(let j=0;j<compData.length;j++) s+=String.fromCharCode(compData[j]);
+          return s;
+        } else if(method === 8){
+          // Deflate — use DecompressionStream if available
+          try {
+            // Synchronous fallback: return raw and hope parser handles it
+            // Real deflate needs async; we return a marker and handle above
+            return decompressDeflate(compData);
+          } catch(e){ return null; }
+        }
+      }
+      i = dataOffset + compSize;
+    } else { i++; }
+  }
+  return null;
+}
+
+function decompressDeflate(data){
+  // Use built-in DecompressionStream (supported in Chrome 80+)
+  // This is synchronous-looking but we handle it via a trick
+  // For Trebedit/Chrome Android this works fine
+  try {
+    const ds = new DecompressionStream('deflate-raw');
+    const writer = ds.writable.getWriter();
+    const reader = ds.readable.getReader();
+    writer.write(data);
+    writer.close();
+
+    // Collect chunks synchronously using a hack
+    let result = '';
+    const decoder = new TextDecoder();
+    // Can't do truly sync, so return a promise-resolved string
+    // We'll handle this properly in readDOCX by making it async
+    return null; // Signal to use async path
+  } catch(e){ return null; }
+}
+
+// Proper async DOCX reader using DecompressionStream
+async function readDOCXAsync(file){
+  const buf = await file.arrayBuffer();
+  const bytes = new Uint8Array(buf);
+
+  const sig = [0x50,0x4B,0x03,0x04];
+  let i = 0;
+  while(i < bytes.length - 30){
+    if(bytes[i]===sig[0]&&bytes[i+1]===sig[1]&&bytes[i+2]===sig[2]&&bytes[i+3]===sig[3]){
+      const fnLen = bytes[i+26]|(bytes[i+27]<<8);
+      const extraLen = bytes[i+28]|(bytes[i+29]<<8);
+      let fname = '';
+      for(let j=0;j<fnLen;j++) fname+=String.fromCharCode(bytes[i+30+j]);
+      const dataOffset = i+30+fnLen+extraLen;
+      const compSize = bytes[i+18]|(bytes[i+19]<<8)|(bytes[i+20]<<16)|(bytes[i+21]<<24);
+      const method = bytes[i+8]|(bytes[i+9]<<8);
+
+      if(fname === 'word/document.xml'){
+        const compData = bytes.slice(dataOffset, dataOffset+compSize);
+        let xmlStr = '';
+
+        if(method === 0){
+          for(let j=0;j<compData.length;j++) xmlStr+=String.fromCharCode(compData[j]);
+        } else if(method === 8){
+          const ds = new DecompressionStream('deflate-raw');
+          const w = ds.writable.getWriter();
+          const r = ds.readable.getReader();
+          w.write(compData); w.close();
+          const chunks = [];
+          let done = false;
+          while(!done){
+            const {value, done:d} = await r.read();
+            if(d){ done=true; break; }
+            chunks.push(value);
+          }
+          const total = chunks.reduce((a,c)=>a+c.length,0);
+          const merged = new Uint8Array(total);
+          let off=0;
+          for(const c of chunks){ merged.set(c,off); off+=c.length; }
+          xmlStr = new TextDecoder().decode(merged);
+        }
+
+        // Strip XML
+        let text = xmlStr
+          .replace(/<w:br[^>]*>/gi,'\n')
+          .replace(/<w:p[ >][^>]*>/gi,'\n')
+          .replace(/<[^>]+>/g,'')
+          .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')
+          .replace(/&quot;/g,'"')
+          .replace(/&#([0-9]+);/g,(_,n)=>String.fromCharCode(Number(n)))
+          .replace(/&#x([0-9a-fA-F]+);/g,(_,h)=>String.fromCharCode(parseInt(h,16)));
+        return text;
+      }
+      i = dataOffset + compSize;
+    } else { i++; }
+  }
+  throw new Error('word/document.xml not found in DOCX.');
+}
+
+// Override handleFile to use async DOCX properly
+async function handleFile(input){
+  const file = input.files[0];
+  if(!file) return;
+  document.getElementById('fname').textContent = file.name;
+  const status = document.getElementById('parse-status');
+  status.style.display='block';
+  status.style.color='var(--muted)';
+  status.textContent = 'Reading file...';
+  pendingQuestions = [];
+
+  try {
+    const ext = file.name.split('.').pop().toLowerCase();
+    let text = '';
+
+    if(ext === 'pdf'){
+      text = await readPDF(file);
+    } else if(ext === 'docx' || ext === 'doc'){
+      text = await readDOCXAsync(file);
+    } else {
+      status.textContent = 'Unsupported file. Use PDF or DOCX.';
+      status.style.color = 'var(--red)'; return;
+    }
+
+    pendingQuestions = parseQuestions(text);
+
+    if(!pendingQuestions.length){
+      status.textContent = '⚠ No questions detected. Make sure format is: numbered question then A) B) C) D) options on separate lines.';
+      status.style.color = 'var(--yellow)';
+    } else {
+      status.textContent = `✓ ${pendingQuestions.length} question(s) loaded. Save exam then set correct answers.`;
+      status.style.color = 'var(--green)';
+      renderQPreview();
+    }
+  } catch(e){
+    status.textContent = 'Read error: ' + e.message;
+    status.style.color = 'var(--red)';
+  }
+}
+
+// ═══════════════════════════════════════════
+// QUESTION PARSER
+// ═══════════════════════════════════════════
+function parseQuestions(raw){
+  const questions = [];
+  // Normalize whitespace but preserve newlines
+  const lines = raw.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>0);
+
+  let cur = null;
+
+  for(const line of lines){
+    // Match question: starts with number + . or )
+    const qm = line.match(/^(\d{1,3})[.)]\s+(.+)/);
+    if(qm){
+      if(cur && cur.options.length >= 2){ questions.push(cur); }
+      cur = { question: qm[2].trim(), options: [], answer: null };
+      continue;
+    }
+
+    if(cur){
+      // Match option: A) or A. or (A) format
+      const om = line.match(/^[\[(]?([A-Ea-e])[\].)]\s*(.+)/);
+      if(om){
+        cur.options.push({ label: om[1].toUpperCase(), text: om[2].trim() });
+        continue;
+      }
+
+      // If line doesn't look like an option but we have no options yet, it may be continuation of question text
+      if(cur.options.length === 0 && !line.match(/^[\[(]?[A-Ea-e][\].)]/)){
+        cur.question += ' ' + line;
+      }
+    }
+  }
+
+  // Push last question
+  if(cur && cur.options.length >= 2) questions.push(cur);
+
+  // Second pass: try splitting on inline options if line-by-line got nothing
+  if(!questions.length){
+    const joined = raw.replace(/\s+/g,' ');
+    const qSplit = joined.split(/(?=\d{1,3}[.)]\s+[A-Z])/);
+    for(const chunk of qSplit){
+      const qm = chunk.match(/^(\d{1,3})[.)]\s+(.+?)(?=[A-Ea-e][.)]\s)/s);
+      if(!qm) continue;
+      const q = qm[2].trim();
+      const opts = [];
+      const optsStr = chunk.slice(qm.index + qm[0].length);
+      const optMatches = [...optsStr.matchAll(/([A-Ea-e])[.)]\s+(.+?)(?=[A-Ea-e][.)]|\s*$)/gs)];
+      for(const om of optMatches) opts.push({label:om[1].toUpperCase(), text:om[2].trim()});
+      if(q && opts.length >= 2) questions.push({question:q, options:opts, answer:null});
+    }
+  }
+
+  return questions;
+}
+
+// ═══════════════════════════════════════════
+// QUESTION PREVIEW
+// ═══════════════════════════════════════════
+function renderQPreview(){
+  const box = document.getElementById('q-preview');
+  const show = pendingQuestions.slice(0,3);
+  box.innerHTML = `
+    <p style="font-size:.75rem;color:var(--muted);margin:.9rem 0 .5rem">Preview — first ${show.length} question(s):</p>
+    ${show.map((q,i)=>`
+      <div style="background:var(--surf2);border-radius:8px;padding:.9rem;margin-bottom:.6rem;border:1px solid var(--border);font-size:.83rem">
+        <p style="font-weight:600;margin-bottom:.4rem">Q${i+1}: ${q.question}</p>
+        ${q.options.map(o=>`<p style="color:var(--muted);margin-bottom:.15rem">${o.label}) ${o.text}</p>`).join('')}
+      </div>
+    `).join('')}
+    ${pendingQuestions.length > 3 ? `<p style="font-size:.75rem;color:var(--muted)">...and ${pendingQuestions.length-3} more.</p>` : ''}
+  `;
+}
+
+// ═══════════════════════════════════════════
+// ADMIN — SAVE EXAM
+// ═══════════════════════════════════════════
+function saveExam(){
+  const title = document.getElementById('etitle-in').value.trim();
+  const dur = parseInt(document.getElementById('edur').value)||30;
+  const pass = parseInt(document.getElementById('epass').value)||50;
+  if(!title){ toast('Enter exam title','err'); return; }
+  if(!pendingQuestions.length){ toast('Upload a file with questions first','err'); return; }
+
+  const e = {
+    id: Date.now().toString(),
+    title, duration: dur, passScore: pass,
+    questions: JSON.parse(JSON.stringify(pendingQuestions)),
+    created: new Date().toLocaleDateString('en-NG')
+  };
+  DB.exams.push(e); saveDB();
+  pendingQuestions = [];
+  document.getElementById('q-preview').innerHTML='';
+  document.getElementById('parse-status').style.display='none';
+  document.getElementById('fname').textContent='Tap to choose file';
+  document.getElementById('etitle-in').value='';
+  document.getElementById('file-in').value='';
+  closeModal('m-create');
+  renderAdminDash();
+  toast('Exam saved — set correct answers now','ok');
+
+  // Auto-open answer setter
+  setTimeout(()=>openAnswerModal(e.id), 400);
+}
+
+// ═══════════════════════════════════════════
+// ADMIN — EDIT EXAM
+// ═══════════════════════════════════════════
+function openEditModal(id){
+  const e = DB.exams.find(x=>x.id===id); if(!e) return;
+  document.getElementById('edit-id').value = id;
+  document.getElementById('edit-title').value = e.title;
+  document.getElementById('edit-dur').value = e.duration;
+  document.getElementById('edit-pass').value = e.passScore;
+  openModal('m-edit');
+}
+
+function saveEdit(){
+  const id = document.getElementById('edit-id').value;
+  const e = DB.exams.find(x=>x.id===id); if(!e) return;
+  e.title = document.getElementById('edit-title').value.trim()||e.title;
+  e.duration = parseInt(document.getElementById('edit-dur').value)||e.duration;
+  e.passScore = parseInt(document.getElementById('edit-pass').value)||e.passScore;
+  saveDB(); closeModal('m-edit'); renderAdminDash();
+  toast('Exam updated','ok');
+}
+
+function deleteExam(id){
+  if(!confirm('Delete this exam? Results will remain.')) return;
+  DB.exams = DB.exams.filter(e=>e.id!==id); saveDB(); renderAdminDash();
+  toast('Exam deleted');
+}
+
+// ═══════════════════════════════════════════
+// ADMIN — SET ANSWERS
+// ═══════════════════════════════════════════
+function openAnswerModal(id){
+  ansEditId = id;
+  const e = DB.exams.find(x=>x.id===id); if(!e) return;
+  const body = document.getElementById('ans-body');
+  body.innerHTML = e.questions.map((q,i)=>`
+    <div style="margin-bottom:1.1rem;padding-bottom:1rem;border-bottom:1px solid var(--border)">
+      <p style="font-size:.85rem;font-weight:600;margin-bottom:.5rem">Q${i+1}: ${q.question}</p>
+      <div style="display:flex;gap:.4rem;flex-wrap:wrap">
+        ${q.options.map(o=>`
+          <button onclick="toggleAns(${i},'${o.label}',this)"
+            style="padding:.35rem .8rem;border-radius:6px;border:1.5px solid var(--border);background:${q.answer===o.label?'var(--accent)':'var(--surf2)'};color:${q.answer===o.label?'#fff':'var(--text)'};cursor:pointer;font-size:.82rem;font-weight:600;transition:background .15s"
+            data-qi="${i}" data-lbl="${o.label}">
+            ${o.label}
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+  openModal('m-answers');
+}
+
+function toggleAns(qi, label, btn){
+  const e = DB.exams.find(x=>x.id===ansEditId); if(!e) return;
+  e.questions[qi].answer = label;
+  // Update button styles in same row
+  btn.closest('div').querySelectorAll('button').forEach(b=>{
+    const isSelected = b.dataset.lbl === label;
+    b.style.background = isSelected ? 'var(--accent)' : 'var(--surf2)';
+    b.style.color = isSelected ? '#fff' : 'var(--text)';
+  });
+}
+
+function saveAnswers(){
+  saveDB(); closeModal('m-answers');
+  toast('Answers saved','ok');
+}
+
+// ═══════════════════════════════════════════
+// ADMIN DASHBOARD RENDER
+// ═══════════════════════════════════════════
+function renderAdminDash(){
+  const el = document.getElementById('exam-list-admin');
+  if(!DB.exams.length){
+    el.innerHTML='<p style="color:var(--muted);font-size:.88rem">No exams yet. Click + New Exam to create one.</p>'; 
+  } else {
+    el.innerHTML = DB.exams.map(e=>{
+      const answered = e.questions.filter(q=>q.answer).length;
+      const total = e.questions.length;
+      return `
+        <div class="card">
+          <div class="card-row">
+            <div>
+              <h3>${e.title}</h3>
+              <span>${total} questions &nbsp;·&nbsp; ${e.duration} min &nbsp;·&nbsp; Pass: ${e.passScore}% &nbsp;·&nbsp; ${e.created}</span><br>
+              <span style="color:${answered===total?'var(--green)':'var(--yellow)'}">${answered}/${total} answers set</span>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-outline btn-sm" onclick="openAnswerModal('${e.id}')">Answers</button>
+              <button class="btn btn-outline btn-sm" onclick="openEditModal('${e.id}')">Edit</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteExam('${e.id}')">Delete</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  const rl = document.getElementById('results-admin');
+  if(!DB.results.length){
+    rl.innerHTML='<p style="color:var(--muted);font-size:.88rem">No results yet.</p>';
+  } else {
+    rl.innerHTML=`
+      <table class="rtable">
+        <thead><tr><th>Name</th><th>Matric</th><th>Exam</th><th>Score</th><th>Result</th><th>Cheats</th><th>Time</th><th>Date</th></tr></thead>
+        <tbody>${DB.results.slice().reverse().map(r=>`
+          <tr>
+            <td>${r.sName}</td><td>${r.sId}</td><td>${r.eTitle}</td>
+            <td>${r.pct}%</td>
+            <td style="color:${r.passed?'var(--green)':'var(--red)'}">${r.passed?'Pass':'Fail'}</td>
+            <td>${r.cheats>0?`<span class="cf">⚠ ${r.cheats}x</span>`:'—'}</td>
+            <td>${r.timeStr}</td><td>${r.date}</td>
+          </tr>
+        `).join('')}</tbody>
+      </table>
+    `;
+  }
+}
+
+// ═══════════════════════════════════════════
+// STUDENT ENTRY
+// ═══════════════════════════════════════════
+function renderStudentEntry(){
+  pickedExamId = null;
+  document.getElementById('student-form').style.display='none';
+  const el = document.getElementById('exam-pick-list');
+  if(!DB.exams.length){
+    el.innerHTML='<p style="color:var(--muted);font-size:.88rem;text-align:center;padding:1rem">No exams available yet.</p>'; return;
+  }
+  el.innerHTML = DB.exams.map(e=>`
+    <div class="exam-pick" onclick="pickExam('${e.id}',this)">
+      <h3>${e.title}</h3>
+      <span>${e.questions.length} questions &nbsp;·&nbsp; ${e.duration} minutes</span>
+    </div>
+  `).join('');
+}
+
+function pickExam(id, el){
+  pickedExamId = id;
+  document.querySelectorAll('.exam-pick').forEach(e=>e.classList.remove('picked'));
+  el.classList.add('picked');
+  const found = DB.exams.find(e=>e.id===id);
+  document.getElementById('selected-exam-label').textContent = '📝 ' + found.title;
+  document.getElementById('student-form').style.display='block';
+  document.getElementById('serr').style.display='none';
+}
+
+// ═══════════════════════════════════════════
+// START EXAM
+// ═══════════════════════════════════════════
+function startExam(){
+  const name = document.getElementById('sname').value.trim();
+  const mid = document.getElementById('smatric').value.trim();
+  const err = document.getElementById('serr');
+  if(!name||!mid){ err.style.display='block'; err.textContent='Fill in all fields.'; return; }
+  if(!pickedExamId){ err.style.display='block'; err.textContent='Select an exam above.'; return; }
+
+  exam = DB.exams.find(e=>e.id===pickedExamId);
+  if(!exam) return;
+
+  student = {name, id: mid};
+  answers = {}; curQ = 0; cheatCount = 0;
+  timeLeft = exam.duration * 60; timeUsed = 0;
+
+  document.getElementById('etitle').textContent = exam.title;
+  document.getElementById('ename').textContent = name + ' — ' + mid;
+
+  go('exam-screen');
+  renderQ();
+  startTimer();
+  bindCheat();
+}
+
+// ═══════════════════════════════════════════
+// RENDER QUESTION
+// ═══════════════════════════════════════════
+function renderQ(){
+  const q = exam.questions[curQ];
+  const tot = exam.questions.length;
+  document.getElementById('qcount').textContent = `${curQ+1} / ${tot}`;
+  document.getElementById('prog').style.width = (((curQ+1)/tot)*100)+'%';
+  const pbtn = document.getElementById('pbtn');
+  const nbtn = document.getElementById('nbtn');
+  pbtn.disabled = curQ===0; pbtn.style.opacity = curQ===0?'0.35':'1';
+  const isLast = curQ===tot-1;
+  nbtn.textContent = isLast ? '✓ Submit' : 'Next →';
+  nbtn.onclick = isLast ? ()=>confirmSubmit() : ()=>navQ(1);
+  nbtn.className = isLast ? 'btn btn-success btn-sm' : 'btn btn-primary btn-sm';
+
+  document.getElementById('exam-body').innerHTML = `
+    <div class="q-block">
+      <div class="q-num">Question ${curQ+1} of ${tot}</div>
+      <div class="q-text">${q.question}</div>
+      <ul class="opt-list">
+        ${q.options.map(o=>`
+          <li class="opt ${answers[curQ]===o.label?'sel':''}" onclick="pickAns(${curQ},'${o.label}')">
+            <div class="opt-lbl">${o.label}</div>
+            <span>${o.text}</span>
+          </li>
+        `).join('')}
+      </ul>
+    </div>
+    <div class="q-nav">
+      ${exam.questions.map((_,i)=>`
+        <div class="q-dot ${answers[i]!==undefined?'ans':''} ${i===curQ?'cur':''}" onclick="jumpQ(${i})">${i+1}</div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function pickAns(qi, label){ answers[qi]=label; renderQ(); }
+function navQ(d){ const n=curQ+d; if(n>=0&&n<exam.questions.length){curQ=n;renderQ();} }
+function jumpQ(i){ curQ=i; renderQ(); }
+
+function confirmSubmit(){
+  const tot = exam.questions.length;
+  const ans = Object.keys(answers).length;
+  const unanswered = tot - ans;
+  if(unanswered>0){
+    if(!confirm(`You have ${unanswered} unanswered question(s). Submit anyway?`)) return;
+  }
+  submitExam(false);
+}
+
+// ═══════════════════════════════════════════
+// TIMER
+// ═══════════════════════════════════════════
+function startTimer(){
+  clearInterval(timerInt);
+  timerInt = setInterval(()=>{
+    timeLeft--; timeUsed++;
+    updateTimer();
+    if(timeLeft<=0){ clearInterval(timerInt); submitExam(true); }
+  },1000);
+}
+
+function updateTimer(){
+  const el = document.getElementById('timer');
+  const m=Math.floor(timeLeft/60), s=timeLeft%60;
+  el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  el.className='timer';
+  if(timeLeft<300) el.className='timer warn';
+  if(timeLeft<60) el.className='timer crit';
+}
+
+// ═══════════════════════════════════════════
+// CHEAT DETECTION
+// ═══════════════════════════════════════════
+let cheatBound = false;
+let blurCooldown = false; // prevent false fire on exam start
+
+function bindCheat(){
+  if(cheatBound) return;
+  cheatBound = true;
+
+  // short cooldown so the exam start click doesn't fire blur immediately
+  blurCooldown = true;
+  setTimeout(()=>{ blurCooldown = false; }, 1500);
+
+  document.addEventListener('copy',       onCopy,    true);
+  document.addEventListener('cut',        onCopy,    true);
+  document.addEventListener('paste',      onPaste,   true);
+  document.addEventListener('keydown',    onKeydown, true);
+  document.addEventListener('contextmenu',onCtx,     true);
+  document.addEventListener('selectstart',onSelect,  true);
+  document.addEventListener('visibilitychange', onVis);
+  window.addEventListener('blur', onBlur);
+
+  // disable text selection via CSS
+  document.getElementById('exam-screen').style.userSelect = 'none';
+  document.getElementById('exam-screen').style.webkitUserSelect = 'none';
+}
+
+function unbindCheat(){
+  if(!cheatBound) return;
+  cheatBound = false;
+  document.removeEventListener('copy',       onCopy,    true);
+  document.removeEventListener('cut',        onCopy,    true);
+  document.removeEventListener('paste',      onPaste,   true);
+  document.removeEventListener('keydown',    onKeydown, true);
+  document.removeEventListener('contextmenu',onCtx,     true);
+  document.removeEventListener('selectstart',onSelect,  true);
+  document.removeEventListener('visibilitychange', onVis);
+  window.removeEventListener('blur', onBlur);
+
+  document.getElementById('exam-screen').style.userSelect = '';
+  document.getElementById('exam-screen').style.webkitUserSelect = '';
+}
+
+function onCopy(e){
+  e.preventDefault();
+  e.stopImmediatePropagation();
+  flagCheat('Copying exam content is not allowed.');
+}
+
+function onPaste(e){
+  e.preventDefault();
+  e.stopImmediatePropagation();
+  flagCheat('Pasting during the exam is not allowed.');
+}
+
+function onKeydown(e){
+  // Block Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+A, Ctrl+U (view source), F12, PrintScreen
+  const ctrl = e.ctrlKey || e.metaKey;
+  if(ctrl && ['c','v','x','a','u','s','p'].includes(e.key.toLowerCase())){
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    if(['c','x'].includes(e.key.toLowerCase())) flagCheat('Keyboard copy shortcut detected.');
+    if(e.key.toLowerCase()==='v') flagCheat('Keyboard paste shortcut detected.');
+  }
+  if(e.key==='F12'||e.key==='PrintScreen'){
+    e.preventDefault();
+    flagCheat('Developer tools / screenshot key detected.');
+  }
+}
+
+function onSelect(e){
+  // Allow selection only on input fields (for name entry etc)
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
+  e.preventDefault();
+}
+
+function onVis(){
+  if(document.hidden) flagCheat('Switching away from the exam tab is not allowed.');
+}
+
+function onBlur(){
+  if(blurCooldown) return;
+  flagCheat('Leaving the exam window is not allowed.');
+}
+
+function onCtx(e){
+  e.preventDefault();
+  e.stopImmediatePropagation();
+  flagCheat('Right-click is disabled during the exam.');
+}
+
+function flagCheat(msg){
+  cheatCount++;
+  document.getElementById('cheat-msg').textContent = msg+` (Incident ${cheatCount} recorded.)`;
+  document.getElementById('cheat-ol').classList.add('show');
+}
+
+function dismissCheat(){ document.getElementById('cheat-ol').classList.remove('show'); }
+
+// ═══════════════════════════════════════════
+// SUBMIT
+// ═══════════════════════════════════════════
+function submitExam(timedOut){
+  clearInterval(timerInt); unbindCheat();
+  document.getElementById('cheat-ol').classList.remove('show');
+
+  const qs = exam.questions;
+  let correct = 0;
+  qs.forEach((q,i)=>{ if(q.answer && answers[i]===q.answer) correct++; });
+
+  const tot = qs.length;
+  const wrong = tot - correct;
+  const pct = Math.round((correct/tot)*100);
+  const passed = pct >= exam.passScore;
+  const mins = Math.floor(timeUsed/60);
+  const secs = timeUsed%60;
+  const timeStr = `${mins}m ${secs}s`;
+
+  DB.results.push({
+    sName: student.name, sId: student.id,
+    eTitle: exam.title, eId: exam.id,
+    correct, wrong, total: tot, pct, passed,
+    cheats: cheatCount, timeStr,
+    date: new Date().toLocaleString('en-NG')
+  });
+  saveDB();
+
+  // Render results
+  document.getElementById('rname').textContent = student.name;
+  document.getElementById('rexam').textContent = exam.title + (timedOut?' — Time Up':'');
+  document.getElementById('rpct').textContent = pct+'%';
+  document.getElementById('rverdict').textContent = passed ? '✓ PASSED' : '✗ FAILED';
+  document.getElementById('rverdict').style.color = passed?'var(--green)':'var(--red)';
+  document.getElementById('rc').textContent = correct;
+  document.getElementById('rw').textContent = wrong;
+  document.getElementById('rt').textContent = tot;
+  document.getElementById('rtime').textContent = timeStr;
+  const ring = document.getElementById('sring');
+  ring.className = 'score-ring '+(passed?'pass-ring':'fail-ring');
+  const rcheat = document.getElementById('rcheat');
+  if(cheatCount>0){
+    rcheat.style.display='block';
+    rcheat.textContent=`⚠ ${cheatCount} suspicious activity incident(s) detected and logged during this exam.`;
+  } else { rcheat.style.display='none'; }
+
+  go('results-screen');
+}
+</script>
+</body>
+</html>
