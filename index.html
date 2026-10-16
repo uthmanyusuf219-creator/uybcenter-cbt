@@ -1,0 +1,3460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Advanced CBT Centre</title>
+<!-- ═══════════════════════════════════════════════════════════
+     FIREBASE v10 COMPAT SDK (CDN)
+     ═══════════════════════════════════════════════════════════ -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<style>
+:root{--bg:#0a0c14;--panel:#181c27;--panel2:#1e2438;--line:#2e3352;--txt:#fff;--muted:#7a82a8;--accent:#c9a84c;--accent2:#e8c96a;--ok:#1db97a;--err:#e05252;--info:#4f8ef7;--radius:10px;--tap:44px}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:clamp(14px,.9vw + 10px,16px);line-height:1.5;overflow-x:hidden;min-height:100dvh;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+.screen{display:none;min-height:100dvh;width:100%}
+.screen.active{display:block}
+.screen.center{display:none;align-items:center;justify-content:center;flex-direction:column;padding:24px}
+.screen.center.active{display:flex}
+.crest{width:clamp(64px,12vw,96px);height:clamp(64px,12vw,96px);border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:clamp(1.6rem,3vw,2.4rem);font-weight:800;color:#0a0c14;margin:0 auto 18px;overflow:hidden;box-shadow:0 0 40px rgba(201,168,76,.28);flex-shrink:0}
+.crest.sm{width:52px;height:52px;font-size:1.3rem;margin-bottom:14px}
+.crest.xs{width:38px;height:38px;font-size:1rem;margin:0;border-radius:10px}
+.crest img{width:100%;height:100%;object-fit:cover}
+.btn{display:block;width:100%;min-height:var(--tap);padding:13px;border-radius:var(--radius);font-size:.95rem;font-weight:700;cursor:pointer;border:none;margin-bottom:11px;transition:filter .15s,transform .1s}
+.btn:active{transform:scale(.985)}
+.btn:hover{filter:brightness(1.08)}
+.btn-gold{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0a0c14}
+.btn-out{background:transparent;border:1.5px solid var(--line);color:#fff}
+.btn:disabled{opacity:.4;cursor:not-allowed;filter:none}
+.sbtn{padding:10px 16px;border-radius:7px;border:1.5px solid var(--line);background:var(--panel2);color:#fff;cursor:pointer;font-size:.8rem;font-weight:600;transition:filter .15s;min-height:38px}
+.sbtn:hover{filter:brightness(1.2)}
+.sbtn-gold{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#0a0c14}
+.sbtn-red{background:var(--err);border-color:var(--err);color:#fff}
+.sbtn:disabled{opacity:.4;cursor:not-allowed}
+label{display:block;font-size:.72rem;font-weight:700;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em}
+input,select,textarea{width:100%;background:var(--panel2);border:1.5px solid var(--line);border-radius:8px;padding:11px 13px;color:#fff;outline:none;margin-bottom:14px;transition:border-color .15s;font-size:1rem}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+textarea{resize:vertical;min-height:80px;line-height:1.55}
+input[type=checkbox],input[type=radio]{width:auto;margin:0;accent-color:var(--accent)}
+input[type=color]{padding:2px;height:44px;cursor:pointer}
+input[type=file]{padding:10px;cursor:pointer;font-size:.85rem}
+.err{color:var(--err);font-size:.78rem;margin-bottom:10px;display:none}
+.err.show{display:block}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px;width:100%;max-width:360px}
+.back{position:fixed;top:14px;left:14px;z-index:50;background:rgba(10,12,20,.85);border:1.5px solid var(--line);color:#fff;padding:9px 16px;border-radius:7px;cursor:pointer;font-size:.82rem;backdrop-filter:blur(6px);min-height:38px}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.b-draft{background:rgba(122,130,168,.18);color:var(--muted)}
+.b-pub{background:rgba(29,185,122,.15);color:var(--ok)}
+.b-closed{background:rgba(224,82,82,.15);color:var(--err)}
+.b-sched{background:rgba(79,142,247,.15);color:var(--info)}
+.empty{padding:34px 18px;text-align:center;color:var(--muted);font-size:.86rem}
+.empty .em-ico{font-size:2rem;margin-bottom:10px;opacity:.6}
+.land-box{max-width:400px;width:100%;text-align:center}
+.land-box h1{font-size:clamp(1.3rem,2.4vw,1.85rem);font-weight:800;margin-bottom:6px;line-height:1.2}
+.motto{color:var(--accent);font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:22px}
+.land-sub{color:var(--muted);font-size:.88rem;margin-bottom:28px;line-height:1.65}
+.topbar{position:sticky;top:0;z-index:40;background:rgba(10,12,20,.97);border-bottom:1px solid var(--line);padding:11px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;backdrop-filter:blur(10px)}
+.tb-left{display:flex;align-items:center;gap:11px;min-width:0;flex:1}
+.tb-title{font-weight:800;font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-sub{font-size:.7rem;color:var(--muted)}
+.tb-right{display:flex;gap:7px;flex-wrap:wrap}
+.tabs{display:flex;gap:5px;padding:10px 16px;overflow-x:auto;border-bottom:1px solid var(--line);background:var(--bg);position:sticky;top:60px;z-index:39;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:8px 16px;border-radius:20px;border:1.5px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;font-size:.79rem;font-weight:700;white-space:nowrap;transition:all .15s;min-height:34px}
+.tab.on{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0a0c14;border-color:transparent}
+.dash-body{max-width:1080px;margin:0 auto;padding:18px 16px 60px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-bottom:20px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px 12px;text-align:center}
+.sv{font-size:1.6rem;font-weight:800;color:var(--accent);line-height:1.1}
+.sl{font-size:.64rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:5px}
+.sec{font-size:.68rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:26px 0 12px;display:flex;align-items:center;gap:10px}
+.sec:first-child{margin-top:0}
+.sec::after{content:'';flex:1;height:1px;background:var(--line)}
+.item{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:15px 17px;margin-bottom:11px;transition:border-color .15s}
+.item h3{font-size:.94rem;margin-bottom:4px;line-height:1.35}
+.meta{font-size:.74rem;color:var(--muted);line-height:1.7}
+.acts{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}
+.status-line{font-size:.73rem;font-weight:600;margin-top:6px}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);-webkit-overflow-scrolling:touch}
+.tw::after{content:'↔ swipe to see more';display:block;font-size:.65rem;color:var(--muted);padding:6px 12px;text-align:center;border-top:1px solid rgba(46,51,82,.4)}
+table{width:100%;border-collapse:collapse;font-size:.78rem}
+th{padding:11px 12px;color:var(--muted);border-bottom:1px solid var(--line);font-weight:700;text-align:left;font-size:.66rem;text-transform:uppercase;white-space:nowrap;letter-spacing:.05em;cursor:pointer;user-select:none}
+th.no-sort{cursor:default}
+th .arw{opacity:.4;font-size:.6rem;margin-left:3px}
+th.on .arw{opacity:1;color:var(--accent)}
+td{padding:11px 12px;border-bottom:1px solid rgba(46,51,82,.5);white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:rgba(255,255,255,.02)}
+.pass{color:var(--ok);font-weight:700}
+.fail{color:var(--err);font-weight:700}
+.pager{display:flex;gap:7px;align-items:center;justify-content:center;margin-top:14px;flex-wrap:wrap;font-size:.8rem;color:var(--muted)}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:200;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(3px)}
+.modal-bg.on{display:flex}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;width:100%;max-width:520px;max-height:92dvh;overflow-y:auto;animation:pop .18s ease-out}
+@keyframes pop{from{transform:scale(.96);opacity:0}to{transform:scale(1);opacity:1}}
+.modal h2{font-size:1.1rem;margin-bottom:16px}
+.modal-sub{font-size:.8rem;color:var(--muted);margin-bottom:16px;line-height:1.6}
+.mfoot{display:flex;gap:9px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+.mfoot .sbtn{flex:1;min-width:100px;text-align:center;padding:12px 16px;min-height:var(--tap)}
+#toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--panel2);border:1.5px solid var(--line);border-radius:9px;padding:12px 22px;font-size:.84rem;z-index:9000;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;max-width:90vw;text-align:center;box-shadow:0 8px 28px rgba(0,0,0,.5)}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.ok{border-color:var(--ok);color:var(--ok)}
+#toast.err{border-color:var(--err);color:var(--err)}
+#toast.warn{border-color:var(--accent);color:var(--accent)}
+#incident{display:none;position:fixed;inset:0;background:rgba(120,10,10,.96);z-index:9500;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:28px}
+#incident.on{display:flex}
+#incident .inc-ico{font-size:3.2rem;margin-bottom:14px}
+#incident h2{color:#fff;font-size:1.3rem;margin-bottom:10px}
+#incident p{color:rgba(255,255,255,.85);max-width:340px;line-height:1.65;font-size:.88rem;margin-bottom:8px}
+#incident .inc-count{font-size:.75rem;opacity:.75;margin-top:12px}
+.ehdr{position:sticky;top:0;z-index:40;background:rgba(10,12,20,.98);border-bottom:1px solid var(--line);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;backdrop-filter:blur(10px)}
+.ehdr-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.ehdr-info{min-width:0}
+.ehdr-title{font-weight:800;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ehdr-sub{font-size:.7rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ehdr-right{text-align:right;flex-shrink:0}
+.timer{font-size:clamp(1.1rem,2vw,1.4rem);font-weight:800;color:var(--info);font-variant-numeric:tabular-nums;letter-spacing:.02em;line-height:1}
+.timer.warn{color:var(--accent)}
+.timer.crit{color:var(--err);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.proctor{font-size:.6rem;color:var(--ok);font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-top:4px;display:flex;align-items:center;gap:4px;justify-content:flex-end}
+.proctor::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--ok);animation:pulse 2s infinite}
+.exam-layout{display:block;padding-bottom:120px}
+.exam-main{min-width:0}
+.ebody{max-width:680px;margin:0 auto;padding:18px 16px 0}
+.exam-aside{max-width:680px;margin:0 auto;padding:16px}
+.qcard{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:16px}
+.qnum{font-size:.68rem;font-weight:800;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+.qtext{font-size:1rem;line-height:1.65;margin-bottom:18px;white-space:pre-wrap;word-break:break-word}
+.opts{list-style:none;display:flex;flex-direction:column;gap:10px}
+.opt{display:flex;align-items:flex-start;gap:12px;background:var(--panel2);border:1.5px solid var(--line);border-radius:9px;padding:14px 16px;cursor:pointer;transition:all .12s;user-select:none;min-height:var(--tap)}
+.opt:hover{border-color:rgba(201,168,76,.5)}
+.opt.sel{border-color:var(--info);background:rgba(79,142,247,.12)}
+.olb{width:28px;height:28px;border-radius:50%;background:var(--line);display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;flex-shrink:0;transition:all .12s}
+.opt.sel .olb{background:var(--info);color:#fff}
+.otext{flex:1;line-height:1.55;word-break:break-word;padding-top:2px}
+.aside-block{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.aside-title{font-size:.68rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.palette{display:flex;flex-wrap:wrap;gap:7px}
+.qd{width:38px;height:38px;border-radius:7px;background:var(--panel2);border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:.76rem;font-weight:800;cursor:pointer;position:relative;transition:all .12s}
+.qd.ans{background:var(--info);border-color:var(--info);color:#fff}
+.qd.cur{border-color:var(--accent);box-shadow:0 0 0 2px rgba(201,168,76,.3)}
+.qd.flag::after{content:'';position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid var(--bg)}
+.flag-btn{width:100%;background:transparent;border:1.5px solid var(--line);color:var(--muted);padding:12px;border-radius:8px;cursor:pointer;font-size:.82rem;font-weight:700;transition:all .15s;min-height:var(--tap)}
+.flag-btn.on{background:var(--accent);border-color:var(--accent);color:#0a0c14}
+.enav{position:fixed;bottom:0;left:0;right:0;z-index:40;background:rgba(10,12,20,.98);border-top:1px solid var(--line);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;backdrop-filter:blur(10px)}
+.enav-mid{font-size:.76rem;color:var(--muted);text-align:center;flex:1}
+#nav-prev,#nav-next{min-height:var(--tap);padding:11px 18px}
+.rbox{max-width:560px;margin:0 auto;width:100%}
+.ring{width:150px;height:150px;border-radius:50%;margin:22px auto;display:flex;align-items:center;justify-content:center;flex-direction:column;position:relative}
+.ring::after{content:'';position:absolute;inset:11px;border-radius:50%;background:var(--bg)}
+.ring-in{position:relative;z-index:1;text-align:center}
+.ring-pct{font-size:2.1rem;font-weight:900;line-height:1}
+.ring-lbl{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:4px}
+.ring.pass{box-shadow:0 0 34px rgba(29,185,122,.28)}
+.ring.fail{box-shadow:0 0 34px rgba(224,82,82,.28)}
+.verdict{font-size:1rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;margin-bottom:18px}
+.verdict.p{color:var(--ok)} .verdict.f{color:var(--err)}
+.rgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:18px 0}
+.rcell{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:14px;text-align:center}
+.rcell .v{font-size:1.2rem;font-weight:800}
+.rcell .l{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:3px}
+.review-q{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:15px;margin-bottom:11px}
+.review-q .rq-text{font-size:.86rem;font-weight:600;margin-bottom:11px;line-height:1.55;white-space:pre-wrap;word-break:break-word}
+.review-opt{display:flex;align-items:flex-start;gap:9px;padding:9px 12px;border-radius:7px;margin-bottom:5px;font-size:.82rem;border:1.5px solid transparent;line-height:1.5}
+.review-opt.correct{background:rgba(29,185,122,.12);border-color:rgba(29,185,122,.35)}
+.review-opt.wrong{background:rgba(224,82,82,.12);border-color:rgba(224,82,82,.35)}
+.review-opt .tag{font-size:.62rem;font-weight:800;padding:2px 6px;border-radius:4px;background:var(--line);flex-shrink:0}
+.review-opt.correct .tag{background:var(--ok);color:#fff}
+.review-opt.wrong .tag{background:var(--err);color:#fff}
+.frow{display:grid;grid-template-columns:1fr;gap:0}
+@media(min-width:640px){.frow{grid-template-columns:1fr 1fr;gap:14px}}
+.chk{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--panel2);border:1.5px solid var(--line);border-radius:9px;margin-bottom:11px;cursor:pointer;font-size:.85rem;min-height:var(--tap)}
+.chk input{width:auto;margin:0;flex-shrink:0}
+.chk span{flex:1}
+.hint{font-size:.72rem;color:var(--muted);margin-top:-9px;margin-bottom:14px;line-height:1.55}
+.note{font-size:.76rem;color:var(--accent);background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.25);border-radius:8px;padding:11px 14px;margin-bottom:14px;line-height:1.55}
+#print-slip{display:none}
+@media print{
+  #app,#toast,#incident,.modal-bg{display:none !important}
+  body{background:#fff;color:#000}
+  #print-slip{display:block !important;padding:24px;font-family:Georgia,serif}
+  .ps-head{text-align:center;border-bottom:3px double #000;padding-bottom:16px;margin-bottom:22px}
+  .ps-head img{width:76px;height:76px;object-fit:contain;margin:0 auto 10px}
+  .ps-head .ps-logo-fb{width:76px;height:76px;border-radius:50%;border:3px solid #000;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:800;margin:0 auto 10px}
+  .ps-head h1{font-size:1.5rem;margin-bottom:5px;letter-spacing:.02em}
+  .ps-head .motto{color:#444;font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:5px}
+  .ps-head .addr{font-size:.78rem;color:#333}
+  .ps-title{text-align:center;font-size:1.05rem;font-weight:700;letter-spacing:.22em;margin:24px 0 18px;text-transform:uppercase}
+  .ps-table{width:100%;border-collapse:collapse;margin-bottom:22px;font-size:.9rem}
+  .ps-table td{padding:8px 10px;border:1px solid #999}
+  .ps-table td:first-child{width:42%;font-weight:700;background:#f2f2f2}
+  .ps-score{text-align:center;font-size:2rem;font-weight:800;margin:22px 0;padding:14px;border:3px double #000}
+  .ps-verdict{text-align:center;font-size:1.1rem;letter-spacing:.2em;margin-bottom:24px;font-weight:800}
+  .ps-sign{display:flex;justify-content:space-between;margin-top:56px;font-size:.85rem}
+  .ps-sign div{text-align:center}
+  .ps-sign .line{border-top:1px solid #000;width:180px;margin-bottom:6px}
+  .ps-foot{text-align:center;font-size:.7rem;color:#666;margin-top:36px;border-top:1px solid #ccc;padding-top:10px}
+}
+@media (min-width: 900px) {
+  .land-box{max-width:520px}
+  .card{max-width:440px;padding:32px}
+  .crest{width:96px;height:96px;font-size:2.4rem}
+  .dash-body{max-width:1200px;padding:28px 32px 80px}
+  .topbar{padding:14px 28px}
+  .tabs{padding:12px 28px;top:66px}
+  .stats{grid-template-columns:repeat(4,1fr);gap:16px}
+  .sv{font-size:1.8rem}
+  .item{padding:18px 22px}
+  .modal{max-width:600px;padding:28px}
+  .rgrid{grid-template-columns:repeat(3,1fr)}
+  .exam-layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:28px;max-width:1200px;margin:0 auto;padding:28px 28px 40px;align-items:flex-start}
+  .exam-main{min-width:0}
+  .ebody{max-width:100%;padding:0;margin:0}
+  .exam-aside{max-width:none;margin:0;padding:0;position:sticky;top:86px;height:fit-content}
+  .enav{position:static;background:transparent;border-top:1px solid var(--line);border-left:none;border-right:none;border-bottom:none;backdrop-filter:none;padding:16px 0 0;margin-top:16px}
+  .qcard{padding:28px}
+  .qtext{font-size:1.08rem}
+  .opt{padding:16px 18px;font-size:1rem}
+  .tw::after{display:none}
+}
+/* Sync badge — injected by the Store module */
+#sync-badge{font-size:.7rem;font-weight:700;padding:6px 10px;border-radius:6px;background:rgba(255,255,255,.05);border:1px solid var(--line);align-self:center;white-space:nowrap;cursor:default;transition:color .3s,border-color .3s}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+<section id="scr-land" class="screen center active">
+  <div class="land-box">
+    <div class="crest" id="land-crest">🏫</div>
+    <h1 id="land-name">Austinvick International School</h1>
+    <p class="motto" id="land-motto">Excellence · Integrity · Innovation</p>
+    <p class="land-sub">Computer Based Testing Centre<br>Choose how you want to continue.</p>
+    <button class="btn btn-gold" data-act="go-student">📝 Take an Exam</button>
+    <button class="btn btn-out" data-act="go-login">🔐 Staff Login</button>
+  </div>
+</section>
+
+<section id="scr-login" class="screen center">
+  <button class="back" data-act="go-land">← Back</button>
+  <div class="card">
+    <div class="crest sm" id="login-crest">🏫</div>
+    <h2 style="text-align:center;font-size:1.15rem;margin-bottom:22px">Staff Login</h2>
+    <form id="login-form" novalidate>
+      <label for="li-user">Username</label>
+      <input id="li-user" type="text" maxlength="32" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+      <label for="li-pass">Password</label>
+      <input id="li-pass" type="password" maxlength="64" autocomplete="current-password" required>
+      <p class="err" id="li-err"></p>
+      <button class="btn btn-gold" type="submit">Login</button>
+    </form>
+  </div>
+</section>
+
+<section id="scr-dash" class="screen">
+  <header class="topbar">
+    <div class="tb-left">
+      <div class="crest xs" id="dash-crest">🏫</div>
+      <div style="min-width:0">
+        <div class="tb-title" id="dash-school">School</div>
+        <div class="tb-sub" id="dash-user"></div>
+      </div>
+    </div>
+    <div class="tb-right" id="dash-actions"></div>
+  </header>
+  <nav class="tabs" id="dash-tabs"></nav>
+  <main class="dash-body" id="dash-body"></main>
+</section>
+
+<section id="scr-examedit" class="screen">
+  <header class="topbar">
+    <div class="tb-left">
+      <button class="sbtn" data-act="edit-back">← Back</button>
+      <div class="tb-title" id="ed-title">New Exam</div>
+    </div>
+    <div class="tb-right">
+      <button class="sbtn sbtn-gold" data-act="edit-save">💾 Save Exam</button>
+    </div>
+  </header>
+  <main class="dash-body" id="ed-body"></main>
+</section>
+
+<section id="scr-pick" class="screen">
+  <button class="back" data-act="go-land">← Back</button>
+  <main class="dash-body" style="max-width:640px;padding-top:76px">
+    <div style="text-align:center;margin-bottom:26px">
+      <div class="crest sm" id="pick-crest">🏫</div>
+      <h2 style="font-size:1.15rem" id="pick-school">Available Exams</h2>
+      <p style="font-size:.82rem;color:var(--muted);margin-top:6px">Select an exam to begin your briefing.</p>
+    </div>
+    <div id="pick-list"></div>
+  </main>
+</section>
+
+<section id="scr-brief" class="screen">
+  <button class="back" data-act="brief-back">← Back</button>
+  <main class="dash-body" style="max-width:560px;padding-top:76px">
+    <div id="brief-body"></div>
+  </main>
+</section>
+
+<section id="scr-exam" class="screen">
+  <header class="ehdr">
+    <div class="ehdr-left">
+      <div class="crest xs" id="exam-crest">🏫</div>
+      <div class="ehdr-info">
+        <div class="ehdr-title" id="exam-title">Exam</div>
+        <div class="ehdr-sub" id="exam-student"></div>
+      </div>
+    </div>
+    <div class="ehdr-right">
+      <div class="timer" id="exam-timer">--:--</div>
+      <div class="proctor" id="exam-proctor">Proctoring Active</div>
+    </div>
+  </header>
+  <div class="exam-layout">
+    <main class="exam-main">
+      <div class="ebody" id="exam-body"></div>
+      <div class="enav">
+        <button class="sbtn" id="nav-prev" data-act="ex-prev">← Prev</button>
+        <div class="enav-mid" id="nav-mid"></div>
+        <button class="sbtn sbtn-gold" id="nav-next" data-act="ex-next">Next →</button>
+      </div>
+    </main>
+    <aside class="exam-aside">
+      <div class="aside-block">
+        <div class="aside-title">Question Palette</div>
+        <div class="palette" id="palette-mount"></div>
+      </div>
+      <div class="aside-block">
+        <button class="flag-btn" id="flag-btn" data-act="flag-q">⚐ Flag for review</button>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<section id="scr-result" class="screen">
+  <main class="dash-body" style="max-width:640px;padding-top:32px">
+    <div class="rbox" id="result-body"></div>
+  </main>
+</section>
+
+</div>
+
+<div id="modal-root"></div>
+<div id="toast"></div>
+
+<div id="incident">
+  <div class="inc-ico">⚠️</div>
+  <h2>Proctoring Notice</h2>
+  <p id="incident-msg">Suspicious activity recorded.</p>
+  <p class="inc-count" id="incident-count"></p>
+  <button class="sbtn sbtn-red" style="margin-top:16px" data-act="incident-dismiss">Return to Exam</button>
+</div>
+
+<div id="print-slip"></div>
+
+<script>
+"use strict";
+
+/* ═══════════════════════════════════════════════════════════════
+   ╔══════════════════════════════════════════════════════════╗
+   ║  STORE — PHASE 2: Firebase Firestore + offline-first      ║
+   ║                                                           ║
+   ║  Every method is async. Every write updates localStorage  ║
+   ║  IMMEDIATELY, then pushes to Firestore in the background. ║
+   ║  Reads return local data instantly and refresh from       ║
+   ║  Firestore via realtime snapshot listeners.               ║
+   ║                                                           ║
+   ║  Public API is 100% identical to Phase 1 — no UI, exam    ║
+   ║  engine, timer or anti-cheat code needs to change.        ║
+   ╚══════════════════════════════════════════════════════════╝
+   ═══════════════════════════════════════════════════════════════ */
+const Store = (() => {
+  const KEY = 'acbt_v2';
+  const SESSION_KEY = 'acbt_v2_session';
+  const AUTH_KEY = 'acbt_v2_auth';
+
+  /* ─── Firebase config ─────────────────────────────────────── */
+  const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyBF2k86oIHR92g1uL_9TG5hfpxYUU-hFWxI",
+    authDomain: "austinvick-cbt.firebaseapp.com",
+    projectId: "austinvick-cbt",
+    storageBucket: "austinvick-cbt.appspot.com",
+    messagingSenderId: "309541479138",
+    appId: "1:309541479138:web:d2f912f781ed98de9474bb"
+  };
+
+  /* ─── In-memory state (single source of truth for reads) ─── */
+  const state = {
+    version: 2,
+    settings: {
+      schoolName: 'Austinvick International School',
+      motto: 'Excellence · Integrity · Innovation',
+      logo: '', accent: '#c9a84c',
+      defaultDuration: 30, defaultPass: 50,
+      showAnswers: true, allowReview: true, strictAntiCheat: true,
+      incidentThreshold: 5, address: '', examOfficer: ''
+    },
+    users: [], students: [], exams: [], results: [], bank: [],
+    seeded: false
+  };
+
+  /* ─── Module internals ─────────────────────────────────────── */
+  let _ready = false;
+  let _db = null;
+  let _storage = null;
+  let _fbReady = false;
+  let _listenersAttached = false;
+  let _notifyTimer = null;
+  const _firstSnap = { exams: true, results: true, students: true, users: true, bank: true, settings: true };
+
+  /* ─── LocalStorage persistence (offline-first) ─────────────── */
+  function _persist() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); return true; }
+    catch (e) { return false; }
+  }
+  function _heal() {
+    if (!Array.isArray(state.users))    state.users = [];
+    if (!Array.isArray(state.students)) state.students = [];
+    if (!Array.isArray(state.exams))    state.exams = [];
+    if (!Array.isArray(state.results))  state.results = [];
+    if (!Array.isArray(state.bank))     state.bank = [];
+    const defs = {
+      schoolName: 'Austinvick International School',
+      motto: 'Excellence · Integrity · Innovation',
+      logo: '', accent: '#c9a84c',
+      defaultDuration: 30, defaultPass: 50,
+      showAnswers: true, allowReview: true, strictAntiCheat: true,
+      incidentThreshold: 5, address: '', examOfficer: ''
+    };
+    if (!state.settings || typeof state.settings !== 'object') state.settings = {};
+    for (const k in defs) if (state.settings[k] === undefined) state.settings[k] = defs[k];
+
+    state.exams.forEach(ex => {
+      if (!Array.isArray(ex.questions)) { ex.questions = []; return; }
+      ex.questions.forEach(q => {
+        if (!Array.isArray(q.options)) q.options = Array.isArray(q.opts) ? q.opts : [];
+        q.options = q.options.filter(o => o && typeof o.text === 'string');
+        q.options.forEach((o, i) => {
+          if (!o.id) o.id = (Date.now().toString(36) + Math.random().toString(36).slice(2, 6));
+          if (!o.label) o.label = ['A','B','C','D','E','F'][i] || '?';
+        });
+        if (!q.id) q.id = (Date.now().toString(36) + Math.random().toString(36).slice(2, 6));
+      });
+    });
+  }
+  async function _load() {
+    if (_ready) return;
+    let raw = null;
+    try { raw = localStorage.getItem(KEY); } catch (e) {}
+    if (raw) {
+      try {
+        const p = JSON.parse(raw);
+        if (p && typeof p === 'object') for (const k in p) state[k] = p[k];
+      } catch (e) {}
+    }
+    _heal();
+    _persist();
+    _ready = true;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     FIREBASE INIT + SNAPSHOT LISTENERS
+     ═══════════════════════════════════════════════════════════ */
+  function _fbAvailable() {
+    return typeof firebase !== 'undefined' && firebase.apps !== undefined;
+  }
+
+  async function _initFirebase() {
+    if (!_fbAvailable()) {
+      console.warn('[Store] Firebase SDK not loaded — running offline-only.');
+      _updateBadge();
+      return;
+    }
+    try {
+      if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+      _db = firebase.firestore();
+      _storage = firebase.storage();
+
+      // Offline persistence so the app works without a network.
+      // synchronizeTabs keeps multiple open tabs in sync.
+      try {
+        await _db.enablePersistence({ synchronizeTabs: true });
+      } catch (e) {
+        console.warn('[Store] enablePersistence not available:', e.code || e.message);
+      }
+
+      _fbReady = true;
+      console.info('[Store] Firebase connected — project:', FIREBASE_CONFIG.projectId);
+
+      _attachListeners();
+      _mountBadge();
+      _updateBadge();
+
+      // React to connectivity changes
+      window.addEventListener('online',  _updateBadge);
+      window.addEventListener('offline', _updateBadge);
+    } catch (e) {
+      console.warn('[Store] Firebase init failed:', e);
+      _fbReady = false;
+      _updateBadge();
+    }
+  }
+
+  /* Realtime listeners — when Firestore pushes new data, update
+     the cache, persist to localStorage, and notify the UI. */
+  function _attachListeners() {
+    if (!_db || _listenersAttached) return;
+    _listenersAttached = true;
+
+    // ─── EXAMS ───
+    _db.collection('exams').onSnapshot(snap => {
+      const arr = [];
+      snap.forEach(d => arr.push(Object.assign({ id: d.id }, d.data())));
+      // First snapshot: if Firestore is empty but local has data, push up.
+      if (_firstSnap.exams) {
+        _firstSnap.exams = false;
+        if (arr.length === 0 && state.exams.length) {
+          state.exams.forEach(e => {
+            _db.collection('exams').doc(e.id).set(e).catch(() => {});
+          });
+          return;
+        }
+      }
+      state.exams = arr;
+      _persist();
+      _notify('exams');
+    }, err => console.warn('[Store] exams snapshot:', err.message));
+
+    // ─── RESULTS ───
+    _db.collection('results').onSnapshot(snap => {
+      const arr = [];
+      snap.forEach(d => arr.push(Object.assign({ id: d.id }, d.data())));
+      if (_firstSnap.results) {
+        _firstSnap.results = false;
+        if (arr.length === 0 && state.results.length) {
+          state.results.forEach(r => {
+            _db.collection('results').doc(r.id).set(r).catch(() => {});
+          });
+          return;
+        }
+      }
+      arr.sort((a, b) => (b.submittedAt || 0) - (a.submittedAt || 0));
+      state.results = arr;
+      _persist();
+      _notify('results');
+    }, err => console.warn('[Store] results snapshot:', err.message));
+
+    // ─── STUDENTS ───
+    _db.collection('students').onSnapshot(snap => {
+      const arr = [];
+      snap.forEach(d => arr.push(Object.assign({ id: d.id }, d.data())));
+      if (_firstSnap.students) {
+        _firstSnap.students = false;
+        if (arr.length === 0 && state.students.length) {
+          state.students.forEach(s => {
+            _db.collection('students').doc(s.code || s.id).set(s).catch(() => {});
+          });
+          return;
+        }
+      }
+      state.students = arr;
+      _persist();
+      _notify('students');
+    }, err => console.warn('[Store] students snapshot:', err.message));
+
+    // ─── USERS (teachers + super admin) ───
+    _db.collection('users').onSnapshot(snap => {
+      const arr = [];
+      snap.forEach(d => arr.push(Object.assign({ id: d.id }, d.data())));
+      if (_firstSnap.users) {
+        _firstSnap.users = false;
+        if (arr.length === 0 && state.users.length) {
+          state.users.forEach(u => {
+            _db.collection('users').doc(u.id).set(u).catch(() => {});
+          });
+          return;
+        }
+      }
+      state.users = arr;
+      _persist();
+      _notify('users');
+    }, err => console.warn('[Store] users snapshot:', err.message));
+
+    // ─── QUESTION BANK ───
+    _db.collection('bank').onSnapshot(snap => {
+      const arr = [];
+      snap.forEach(d => arr.push(Object.assign({ id: d.id }, d.data())));
+      if (_firstSnap.bank) {
+        _firstSnap.bank = false;
+        if (arr.length === 0 && state.bank.length) {
+          state.bank.forEach(b => {
+            _db.collection('bank').doc(b.id).set(b).catch(() => {});
+          });
+          return;
+        }
+      }
+      state.bank = arr;
+      _persist();
+      _notify('bank');
+    }, err => console.warn('[Store] bank snapshot:', err.message));
+
+    // ─── SETTINGS (single doc) ───
+    _db.collection('settings').doc('main').onSnapshot(doc => {
+      if (!doc.exists) {
+        if (_firstSnap.settings && Object.keys(state.settings).length) {
+          _firstSnap.settings = false;
+          _db.collection('settings').doc('main').set(state.settings).catch(() => {});
+        }
+        return;
+      }
+      _firstSnap.settings = false;
+      const data = doc.data() || {};
+      state.settings = Object.assign({}, state.settings, data);
+      _persist();
+      _notify('settings');
+    }, err => console.warn('[Store] settings snapshot:', err.message));
+  }
+
+  /* ─── Notify the UI (debounced) ──────────────────────────────── */
+  function _notify(what) {
+    clearTimeout(_notifyTimer);
+    _notifyTimer = setTimeout(() => {
+      if (typeof window.onStoreChange === 'function') {
+        try { window.onStoreChange(what); } catch (e) {}
+      }
+    }, 250);
+  }
+
+  /* ─── Firestore write helpers (fire-and-forget) ─────────────── */
+  function _fbSet(collection, docId, data) {
+    if (!_db || !_fbReady) return;
+    try {
+      const clean = JSON.parse(JSON.stringify(data));
+      _db.collection(collection).doc(docId).set(clean).catch(e => {
+        console.warn('[Store] fb set failed:', collection, docId, e.message);
+      });
+    } catch (e) {}
+  }
+  function _fbDel(collection, docId) {
+    if (!_db || !_fbReady) return;
+    try {
+      _db.collection(collection).doc(docId).delete().catch(e => {
+        console.warn('[Store] fb del failed:', collection, docId, e.message);
+      });
+    } catch (e) {}
+  }
+  function _fbDeleteWhere(collection, field, value) {
+    if (!_db || !_fbReady) return;
+    try {
+      _db.collection(collection).where(field, '==', value).get()
+        .then(snap => snap.forEach(d => d.ref.delete().catch(() => {})))
+        .catch(() => {});
+    } catch (e) {}
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     ONLINE / OFFLINE BADGE
+     ═══════════════════════════════════════════════════════════ */
+  function _mountBadge() {
+    // Inject into the dashboard topbar. Re-injects if renderDash wipes it.
+    const ensureIn = () => {
+      const host = document.getElementById('dash-actions');
+      if (!host) return;
+      if (host.querySelector('#sync-badge')) { _updateBadge(); return; }
+      const b = document.createElement('span');
+      b.id = 'sync-badge';
+      b.textContent = '🟢 Online';
+      host.insertBefore(b, host.firstChild);
+      _updateBadge();
+    };
+    ensureIn();
+    // Watch dash-actions so the badge survives re-renders.
+    const attach = () => {
+      const host = document.getElementById('dash-actions');
+      if (!host) { setTimeout(attach, 400); return; }
+      const mo = new MutationObserver(ensureIn);
+      mo.observe(host, { childList: true });
+      ensureIn();
+    };
+    attach();
+  }
+
+  function _updateBadge() {
+    const b = document.getElementById('sync-badge');
+    if (!b) return;
+    const on = navigator.onLine && _fbReady;
+    b.textContent = on ? '🟢 Online' : '🟡 Offline — will sync later';
+    b.style.color = on ? 'var(--ok)' : 'var(--accent)';
+    b.style.borderColor = on ? 'rgba(29,185,122,.35)' : 'rgba(201,168,76,.35)';
+    b.title = on
+      ? 'Connected to Firestore — changes sync immediately.'
+      : 'Working offline — changes will sync when the connection returns.';
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     PUBLIC API — identical signatures to Phase 1
+     ═══════════════════════════════════════════════════════════ */
+  return {
+    async init() {
+      await _load();
+      // Non-blocking: Firestore spins up in the background so the
+      // UI appears instantly from localStorage.
+      _initFirebase().catch(e => console.warn('[Store] init:', e));
+      return state;
+    },
+    get cache() { return state; },
+
+    /* ═════════ EXAMS ═════════ */
+    async getExams() { return state.exams.map(e => JSON.parse(JSON.stringify(e))); },
+    async getExam(id) {
+      const e = state.exams.find(x => x.id === id);
+      return e ? JSON.parse(JSON.stringify(e)) : null;
+    },
+    async saveExam(exam) {
+      if (!exam || !exam.id) throw new Error('saveExam: missing id');
+      const i = state.exams.findIndex(e => e.id === exam.id);
+      const copy = JSON.parse(JSON.stringify(exam));
+      if (i >= 0) state.exams[i] = copy;
+      else state.exams.push(copy);
+      if (!_persist()) throw new Error('Storage quota exceeded');
+      _fbSet('exams', exam.id, copy);        // background push
+    },
+    async deleteExam(id) {
+      state.exams = state.exams.filter(e => e.id !== id);
+      state.results = state.results.filter(r => r.examId !== id);
+      _persist();
+      _fbDel('exams', id);
+      _fbDeleteWhere('results', 'examId', id);
+    },
+
+    /* ═════════ RESULTS ═════════ */
+    async getResults() { return state.results.map(r => JSON.parse(JSON.stringify(r))); },
+    async getResultsByExam(examId) {
+      return state.results.filter(r => r.examId === examId).map(r => JSON.parse(JSON.stringify(r)));
+    },
+    async getResultsByTeacher(tid) {
+      return state.results.filter(r => r.teacherId === tid).map(r => JSON.parse(JSON.stringify(r)));
+    },
+    async saveResult(result) {
+      if (!result || !result.id) throw new Error('saveResult: missing id');
+      const i = state.results.findIndex(r => r.id === result.id);
+      const copy = JSON.parse(JSON.stringify(result));
+      if (i >= 0) state.results[i] = copy;
+      else state.results.push(copy);
+      if (!_persist()) throw new Error('Storage quota exceeded');
+      _fbSet('results', result.id, copy);
+    },
+    async deleteResult(id) {
+      state.results = state.results.filter(r => r.id !== id);
+      _persist();
+      _fbDel('results', id);
+    },
+
+    /* ═════════ STUDENTS ═════════ */
+    async getStudents() { return state.students.map(s => JSON.parse(JSON.stringify(s))); },
+    async getStudent(code) {
+      const k = String(code || '').trim().toUpperCase();
+      const s = state.students.find(x => x.code.toUpperCase() === k);
+      return s ? JSON.parse(JSON.stringify(s)) : null;
+    },
+    async saveStudent(student) {
+      if (!student || !student.code) throw new Error('saveStudent: missing code');
+      const k = student.code.trim().toUpperCase();
+      const norm = Object.assign({}, student, { code: k });
+      const copy = JSON.parse(JSON.stringify(norm));
+      const i = state.students.findIndex(s => s.code.toUpperCase() === k);
+      if (i >= 0) state.students[i] = copy;
+      else state.students.push(copy);
+      if (!_persist()) throw new Error('Storage quota exceeded');
+      // Use code as the doc id so lookups stay consistent across devices
+      _fbSet('students', k, copy);
+    },
+    async deleteStudent(code) {
+      const k = String(code || '').trim().toUpperCase();
+      state.students = state.students.filter(s => s.code.toUpperCase() !== k);
+      _persist();
+      _fbDel('students', k);
+    },
+    async bulkImportStudents(list) {
+      const result = { added: 0, skipped: 0, invalid: 0 };
+      if (!Array.isArray(list)) return result;
+      const seen = new Set();
+      const batch = [];
+      for (const raw of list) {
+        if (!raw || typeof raw !== 'object') { result.invalid++; continue; }
+        const name = String(raw.name || '').trim();
+        const code = String(raw.code || '').trim().toUpperCase();
+        if (!name || !code) { result.invalid++; continue; }
+        if (seen.has(code)) { result.skipped++; continue; }
+        if (state.students.some(s => s.code.toUpperCase() === code)) { result.skipped++; continue; }
+        seen.add(code);
+        batch.push({
+          id: raw.id || (Date.now().toString(36) + Math.random().toString(36).slice(2, 8)),
+          name, code,
+          klass: String(raw.klass || '').trim(),
+          email: String(raw.email || '').trim(),
+          createdAt: raw.createdAt || Date.now()
+        });
+        result.added++;
+      }
+      for (const s of batch) state.students.push(s);
+      _persist();
+      // Push all in the background
+      batch.forEach(s => _fbSet('students', s.code, s));
+      return result;
+    },
+
+    /* ═════════ TEACHERS ═════════ */
+    async getTeachers() {
+      return state.users.filter(u => u.role === 'teacher').map(u => JSON.parse(JSON.stringify(u)));
+    },
+    async saveTeacher(t) {
+      if (!t || !t.id) throw new Error('saveTeacher: missing id');
+      const copy = JSON.parse(JSON.stringify(t));
+      const i = state.users.findIndex(u => u.id === t.id);
+      if (i >= 0) state.users[i] = copy;
+      else state.users.push(copy);
+      if (!_persist()) throw new Error('Storage quota exceeded');
+      _fbSet('users', t.id, copy);
+    },
+    async deleteTeacher(id) {
+      state.users = state.users.filter(u => u.id !== id);
+      _persist();
+      _fbDel('users', id);
+    },
+
+    /* ═════════ AUTH INTERNALS ═════════ */
+    async findUserByUsername(username) {
+      const u = String(username || '').trim().toLowerCase();
+      const found = state.users.find(x => x.username.toLowerCase() === u);
+      return found ? JSON.parse(JSON.stringify(found)) : null;
+    },
+    async findUserById(id) {
+      const found = state.users.find(x => x.id === id);
+      return found ? JSON.parse(JSON.stringify(found)) : null;
+    },
+    async updateUserRecord(user) {
+      if (!user || !user.id) throw new Error('updateUserRecord: missing id');
+      const copy = JSON.parse(JSON.stringify(user));
+      const i = state.users.findIndex(u => u.id === user.id);
+      if (i >= 0) state.users[i] = copy;
+      else state.users.push(copy);
+      _persist();
+      _fbSet('users', user.id, copy);
+    },
+    async isSeeded() { return !!state.seeded; },
+    async markSeeded() {
+      state.seeded = true;
+      _persist();
+      _fbSet('settings', 'seeded', { seeded: true });
+    },
+
+    /* ═════════ SETTINGS ═════════ */
+    async getSettings() { return JSON.parse(JSON.stringify(state.settings)); },
+    async saveSettings(s) {
+      Object.assign(state.settings, s || {});
+      _persist();
+      const copy = JSON.parse(JSON.stringify(state.settings));
+      if (copy.logo && copy.logo.startsWith('data:')) delete copy.logo;
+      _fbSet('settings', 'main', copy);
+      return state.settings;
+    },
+    async uploadLogo(dataURL) {
+      if (!_storage || !_fbReady) {
+        Object.assign(state.settings, { logo: dataURL });
+        _persist();
+        return dataURL;
+      }
+      try {
+        const ref = _storage.ref('school/logo');
+        await ref.putString(dataURL, 'data_url');
+        const url = await ref.getDownloadURL();
+        Object.assign(state.settings, { logo: url });
+        _persist();
+        const copy = JSON.parse(JSON.stringify(state.settings));
+        _fbSet('settings', 'main', copy);
+        return url;
+      } catch (e) {
+        Object.assign(state.settings, { logo: dataURL });
+        _persist();
+        return dataURL;
+      }
+    },
+
+    /* ═════════ QUESTION BANK ═════════ */
+    async getBank() { return state.bank.map(b => JSON.parse(JSON.stringify(b))); },
+    async saveBankItems(items) {
+      if (!Array.isArray(items)) return;
+      for (const item of items) {
+        if (!item || !item.id) continue;
+        const copy = JSON.parse(JSON.stringify(item));
+        const i = state.bank.findIndex(x => x.id === item.id);
+        if (i >= 0) state.bank[i] = copy;
+        else state.bank.push(copy);
+        _fbSet('bank', item.id, copy);
+      }
+      _persist();
+    },
+
+    /* ═════════ SESSION (local-only) ═════════ */
+    async getSession() {
+      try {
+        const raw = localStorage.getItem(SESSION_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) { return null; }
+    },
+    async saveSession(s) {
+      try { localStorage.setItem(SESSION_KEY, JSON.stringify(s)); } catch (e) {}
+    },
+    async clearSession() {
+      try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
+    },
+
+    /* ═════════ AUTH FLAG (local-only) ═════════ */
+    async getAuth() {
+      try {
+        const raw = sessionStorage.getItem(AUTH_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) { return null; }
+    },
+    async setAuth(user) {
+      try { sessionStorage.setItem(AUTH_KEY, JSON.stringify(user)); } catch (e) {}
+    },
+    async clearAuth() {
+      try { sessionStorage.removeItem(AUTH_KEY); } catch (e) {}
+    },
+
+    /* ═════════ FULL RESET ═════════ */
+    async resetAll() {
+      // Wipe local storage first
+      try { localStorage.removeItem(KEY); } catch (e) {}
+      try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
+      try { sessionStorage.removeItem(AUTH_KEY); } catch (e) {}
+
+      // Wipe Firestore collections in the background
+      if (_db && _fbReady) {
+        const wipe = (coll) => _db.collection(coll).get()
+          .then(snap => Promise.all(snap.docs.map(d => d.ref.delete())))
+          .catch(() => {});
+        await Promise.all([
+          wipe('exams'), wipe('results'), wipe('students'),
+          wipe('users'), wipe('bank')
+        ]);
+        _db.collection('settings').doc('main').delete().catch(() => {});
+      }
+
+      state.version = 2;
+      state.settings = {
+        schoolName: 'Austinvick International School',
+        motto: 'Excellence · Integrity · Innovation',
+        logo: '', accent: '#c9a84c',
+        defaultDuration: 30, defaultPass: 50,
+        showAnswers: true, allowReview: true, strictAntiCheat: true,
+        incidentThreshold: 5, address: '', examOfficer: ''
+      };
+      state.users = [];
+      state.students = [];
+      state.exams = [];
+      state.results = [];
+      state.bank = [];
+      state.seeded = false;
+      _persist();
+    }
+  };
+})();
+
+/* Live read-only view of the in-memory state. */
+const DB = Store.cache;
+
+/* ═══════════════════════════════════════════════════════════════
+   CONSTANTS & UTILITIES
+   ═══════════════════════════════════════════════════════════════ */
+const PAGE_SIZE = 25;
+const MAX_LOGO_B = 500 * 1024;
+const LETTERS = ['A','B','C','D','E','F'];
+
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const esc = v => String(v ?? '').replace(/[&<>"']/g,
+  c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clean = v => String(v ?? '').trim().replace(/\s+/g, ' ');
+
+function fmtTime(s) { s = Math.max(0, Math.floor(s)); const m = Math.floor(s/60), x = s%60; return m + 'm ' + String(x).padStart(2,'0') + 's'; }
+function fmtClock(s) { s = Math.max(0, Math.floor(s)); const m = Math.floor(s/60), x = s%60; return String(m).padStart(2,'0') + ':' + String(x).padStart(2,'0'); }
+function fmtDate(d) { if (!d) return '—'; const dt = new Date(d); if (isNaN(dt)) return '—'; return dt.toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
+function fmtDateShort(d) { if (!d) return '—'; const dt = new Date(d); if (isNaN(dt)) return '—'; return dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); }
+function toLocalInput(ts) { if (!ts) return ''; const d = new Date(ts); if (isNaN(d)) return ''; const p = n => String(n).padStart(2,'0'); return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+'T'+p(d.getHours())+':'+p(d.getMinutes()); }
+function shuffle(a) { const x = a.slice(); for (let i = x.length - 1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [x[i],x[j]] = [x[j],x[i]]; } return x; }
+function lighten(hex, amt) { const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex); if (!m) return hex; const c = [1,2,3].map(i => Math.min(255, Math.round(parseInt(m[i],16) + (255 - parseInt(m[i],16))*amt))); return '#' + c.map(v => v.toString(16).padStart(2,'0')).join(''); }
+
+/* ═══════════════════════════════════════════════════════════════
+   CRYPTO
+   ═══════════════════════════════════════════════════════════════ */
+function randomSalt() {
+  if (window.crypto && crypto.getRandomValues) {
+    const a = new Uint8Array(16);
+    crypto.getRandomValues(a);
+    return Array.from(a, b => b.toString(16).padStart(2,'0')).join('');
+  }
+  let s = '';
+  for (let i = 0; i < 32; i++) s += Math.floor(Math.random()*16).toString(16);
+  return s;
+}
+function fallbackHash(str) {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193); }
+  let out = '';
+  for (let r = 0; r < 8; r++) { h = Math.imul(h ^ r, 0x01000193); out += (h >>> 0).toString(16).padStart(8,'0'); }
+  return out;
+}
+async function sha256(text) {
+  if (window.crypto && crypto.subtle && crypto.subtle.digest) {
+    try {
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+      return Array.from(new Uint8Array(buf), b => b.toString(16).padStart(2,'0')).join('');
+    } catch (e) {}
+  }
+  return fallbackHash(text);
+}
+const hashPassword = (pw, salt) => sha256(salt + '::' + pw);
+
+/* ═══════════════════════════════════════════════════════════════
+   UI HELPERS
+   ═══════════════════════════════════════════════════════════════ */
+let toastTimer = null;
+function toast(msg, type = '') {
+  const el = $('#toast');
+  el.textContent = msg;
+  el.className = 'on ' + type;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.className = type; }, 3000);
+}
+function openModal(html, onMount) {
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg on';
+  bg.innerHTML = '<div class="modal" role="dialog" aria-modal="true">' + html + '</div>';
+  $('#modal-root').appendChild(bg);
+  bg.addEventListener('mousedown', e => { if (e.target === bg) closeModal(bg); });
+  if (typeof onMount === 'function') onMount(bg);
+  const first = bg.querySelector('input,select,textarea,button');
+  if (first) setTimeout(() => first.focus(), 40);
+  return bg;
+}
+function closeModal(el) {
+  const bg = el.classList && el.classList.contains('modal-bg') ? el : el.closest('.modal-bg');
+  if (bg && bg.parentNode) bg.parentNode.removeChild(bg);
+}
+function closeTopModal() {
+  const all = $$('#modal-root .modal-bg');
+  if (all.length) closeModal(all[all.length - 1]);
+  return all.length > 0;
+}
+function confirmDialog(title, msg, label = 'Confirm', danger = true) {
+  return new Promise(res => {
+    const bg = openModal(
+      '<h2>' + esc(title) + '</h2>' +
+      '<p class="modal-sub">' + msg + '</p>' +
+      '<div class="mfoot">' +
+        '<button class="sbtn" data-r="0">Cancel</button>' +
+        '<button class="sbtn ' + (danger ? 'sbtn-red' : 'sbtn-gold') + '" data-r="1">' + esc(label) + '</button>' +
+      '</div>'
+    );
+    bg.addEventListener('click', e => {
+      const b = e.target.closest('[data-r]');
+      if (!b) return;
+      closeModal(bg);
+      res(b.dataset.r === '1');
+    });
+  });
+}
+function downloadCSV(filename, rows) {
+  const csv = rows.map(r => r.map(c => {
+    const s = String(c ?? '');
+    return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+  }).join(',')).join('\r\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 100);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AUTH
+   ═══════════════════════════════════════════════════════════════ */
+let CURRENT_USER = null;
+
+async function seedAdmin() {
+  if (await Store.isSeeded()) {
+    const existing = await Store.findUserByUsername('admin');
+    if (existing && existing.role === 'super') return;
+  }
+  const salt = randomSalt();
+  const hash = await hashPassword('admin123', salt);
+  const existing = await Store.findUserByUsername('admin');
+  const rec = {
+    id: existing ? existing.id : uid(),
+    role: 'super', username: 'admin', name: 'Super Administrator',
+    salt, hash, active: true, mustChange: true,
+    createdAt: existing ? existing.createdAt : Date.now()
+  };
+  await Store.updateUserRecord(rec);
+  await Store.markSeeded();
+}
+async function tryLogin(username, password) {
+  const user = await Store.findUserByUsername(username);
+  if (!user) return { ok: false, msg: 'Username not found.' };
+  if (!user.active) return { ok: false, msg: 'This account is suspended.' };
+  const h = await hashPassword(password, user.salt);
+  if (h !== user.hash) return { ok: false, msg: 'Incorrect password.' };
+  return { ok: true, user };
+}
+async function setSession(u) {
+  CURRENT_USER = { id: u.id, role: u.role, username: u.username, name: u.name };
+  await Store.setAuth(CURRENT_USER);
+}
+async function clearSession() {
+  CURRENT_USER = null;
+  await Store.clearAuth();
+}
+async function restoreSession() {
+  const s = await Store.getAuth();
+  if (!s) return null;
+  const u = await Store.findUserById(s.id);
+  if (!u || !u.active) return null;
+  CURRENT_USER = { id: u.id, role: u.role, username: u.username, name: u.name };
+  return CURRENT_USER;
+}
+async function changePassword(userId, newPw) {
+  const u = await Store.findUserById(userId);
+  if (!u) return false;
+  u.salt = randomSalt();
+  u.hash = await hashPassword(newPw, u.salt);
+  u.mustChange = false;
+  await Store.updateUserRecord(u);
+  return true;
+}
+function forcePasswordChange() {
+  const bg = openModal(
+    '<h2>🔐 Change Your Password</h2>' +
+    '<p class="modal-sub">For security, replace the default password before continuing.</p>' +
+    '<label for="fp1">New Password (min 6 characters)</label>' +
+    '<input id="fp1" type="password" maxlength="64" autocomplete="new-password">' +
+    '<label for="fp2">Confirm New Password</label>' +
+    '<input id="fp2" type="password" maxlength="64" autocomplete="new-password">' +
+    '<p class="err" id="fp-err"></p>' +
+    '<div class="mfoot"><button class="sbtn sbtn-gold" id="fp-go">Update Password</button></div>'
+  );
+  bg.querySelector('#fp-go').addEventListener('click', async () => {
+    const a = bg.querySelector('#fp1').value;
+    const b = bg.querySelector('#fp2').value;
+    const err = bg.querySelector('#fp-err');
+    if (a.length < 6) { err.textContent = 'Password must be at least 6 characters.'; err.classList.add('show'); return; }
+    if (a !== b) { err.textContent = 'Passwords do not match.'; err.classList.add('show'); return; }
+    await changePassword(CURRENT_USER.id, a);
+    closeModal(bg);
+    toast('Password updated successfully.', 'ok');
+  });
+  bg.addEventListener('mousedown', e => { if (e.target === bg) e.stopPropagation(); }, true);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ROUTER & CREST
+   ═══════════════════════════════════════════════════════════════ */
+function showScreen(id) {
+  $$('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+  window.scrollTo(0, 0);
+}
+function crestHTML(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (DB.settings.logo) el.innerHTML = '<img src="' + esc(DB.settings.logo) + '" alt="logo">';
+  else {
+    const c = (DB.settings.schoolName || 'A').trim().charAt(0).toUpperCase();
+    el.textContent = c || '🏫';
+  }
+}
+function renderLanding() {
+  $('#land-name').textContent = DB.settings.schoolName;
+  $('#land-motto').textContent = DB.settings.motto;
+  ['land-crest','login-crest','pick-crest','dash-crest','exam-crest'].forEach(crestHTML);
+  $('#pick-school').textContent = DB.settings.schoolName;
+  $('#dash-school').textContent = DB.settings.schoolName;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DASHBOARD
+   ═══════════════════════════════════════════════════════════════ */
+let dashTab = null;
+
+const TABS = {
+  super: [
+    { id: 'overview', label: 'Overview' },
+    { id: 'teachers', label: 'Teachers' },
+    { id: 'students', label: 'Students' },
+    { id: 'exams',    label: 'Exams' },
+    { id: 'results',  label: 'Results' },
+    { id: 'settings', label: 'Settings' }
+  ],
+  teacher: [
+    { id: 'exams',     label: 'My Exams' },
+    { id: 'students',  label: 'Students' },
+    { id: 'results',   label: 'Results' },
+    { id: 'analytics', label: 'Analytics' }
+  ]
+};
+function renderDash() {
+  if (!CURRENT_USER) return;
+  const role = CURRENT_USER.role;
+  renderLanding();
+  $('#dash-user').textContent = (CURRENT_USER.name || CURRENT_USER.username) + ' · ' + (role === 'super' ? 'Super Admin' : 'Teacher');
+  $('#dash-actions').innerHTML =
+    (role === 'teacher' || role === 'super' ? '<button class="sbtn sbtn-gold" data-act="new-exam">+ New Exam</button>' : '') +
+    (role === 'super' ? '<button class="sbtn" data-act="open-settings">⚙ Settings</button>' : '') +
+    '<button class="sbtn" data-act="logout">Logout</button>';
+  const tabs = TABS[role] || [];
+  if (!dashTab || !tabs.some(t => t.id === dashTab)) dashTab = tabs[0] ? tabs[0].id : 'overview';
+  $('#dash-tabs').innerHTML = tabs.map(t =>
+    '<button class="tab' + (t.id === dashTab ? ' on' : '') + '" data-act="tab" data-tab="' + t.id + '">' + esc(t.label) + '</button>'
+  ).join('');
+  renderDashBody();
+}
+function renderDashBody() {
+  const role = CURRENT_USER.role;
+  if (role === 'super' && dashTab === 'overview') return renderOverview();
+  if (role === 'super' && dashTab === 'teachers') return renderTeachers();
+  if (dashTab === 'students') return renderStudents();
+  if (dashTab === 'exams') return renderExams();
+  if (dashTab === 'results') return renderResults();
+  if (role === 'super' && dashTab === 'settings') return renderSettings();
+  if (role === 'teacher' && dashTab === 'analytics') return renderAnalytics();
+  $('#dash-body').innerHTML = '<div class="empty"><div class="em-ico">📭</div>Nothing here.</div>';
+}
+function stat(v, l) { return '<div class="stat"><div class="sv">' + esc(v) + '</div><div class="sl">' + esc(l) + '</div></div>'; }
+function emptyState(ico, msg, sub) {
+  return '<div class="empty"><div class="em-ico">' + ico + '</div>' +
+    '<div style="font-weight:700;color:#fff;margin-bottom:6px">' + esc(msg) + '</div>' +
+    (sub ? '<div style="font-size:.78rem">' + esc(sub) + '</div>' : '') + '</div>';
+}
+
+/* ---------- OVERVIEW ---------- */
+function renderOverview() {
+  const results = DB.results;
+  const passed = results.filter(r => r.passed).length;
+  const avg = results.length ? Math.round(results.reduce((a,r) => a + r.pct, 0)/results.length) : 0;
+  const rate = results.length ? Math.round((passed/results.length)*100) : 0;
+  $('#dash-body').innerHTML =
+    '<div class="stats">' +
+      stat(DB.students.length, 'Students') +
+      stat(DB.users.filter(u => u.role === 'teacher').length, 'Teachers') +
+      stat(DB.exams.length, 'Exams') +
+      stat(results.length, 'Attempts') +
+      stat(rate + '%', 'Pass Rate') +
+      stat(avg + '%', 'Avg Score') +
+    '</div>' +
+    '<div class="sec">Recent Attempts</div>' +
+    (results.length
+      ? '<div class="tw"><table><thead><tr>' +
+          '<th class="no-sort">Student</th><th class="no-sort">Exam</th>' +
+          '<th class="no-sort">Teacher</th><th class="no-sort">Score</th>' +
+          '<th class="no-sort">Result</th><th class="no-sort">Date</th>' +
+        '</tr></thead><tbody>' +
+        results.slice(0, 10).map(r =>
+          '<tr><td>' + esc(r.studentName) + '</td><td>' + esc(r.examTitle) + '</td>' +
+          '<td>' + esc(r.teacherName || '—') + '</td><td>' + r.pct + '%</td>' +
+          '<td class="' + (r.passed ? 'pass' : 'fail') + '">' +
+            (r.terminated ? 'TERMINATED' : (r.passed ? 'PASS' : 'FAIL')) + '</td>' +
+          '<td>' + esc(fmtDateShort(r.submittedAt)) + '</td></tr>'
+        ).join('') + '</tbody></table></div>'
+      : emptyState('📊', 'No exam attempts recorded yet.', 'Results will appear here once students start taking exams.'));
+}
+
+/* ---------- TEACHERS ---------- */
+function renderTeachers() {
+  const teachers = DB.users.filter(u => u.role === 'teacher');
+  $('#dash-body').innerHTML =
+    '<div class="sec">Teacher Accounts (' + teachers.length + ')</div>' +
+    (teachers.length
+      ? teachers.map(t => {
+          const ex = DB.exams.filter(e => e.teacherId === t.id).length;
+          const rs = DB.results.filter(r => r.teacherId === t.id).length;
+          return '<div class="item">' +
+            '<h3>' + esc(t.name) + ' <span class="badge ' + (t.active ? 'b-pub' : 'b-closed') + '">' + (t.active ? 'Active' : 'Suspended') + '</span></h3>' +
+            '<div class="meta">@' + esc(t.username) + ' · ' + ex + ' exams · ' + rs + ' results · Created ' + esc(fmtDateShort(t.createdAt)) + '</div>' +
+            '<div class="acts">' +
+              '<button class="sbtn" data-act="edit-teacher" data-id="' + t.id + '">Edit</button>' +
+              '<button class="sbtn" data-act="reset-teacher" data-id="' + t.id + '">Reset Password</button>' +
+              '<button class="sbtn" data-act="toggle-teacher" data-id="' + t.id + '">' + (t.active ? 'Suspend' : 'Activate') + '</button>' +
+              '<button class="sbtn sbtn-red" data-act="del-teacher" data-id="' + t.id + '">Delete</button>' +
+            '</div></div>';
+        }).join('')
+      : emptyState('👩‍🏫', 'No teacher accounts yet.', 'Create a teacher account so staff can build and manage exams.')) +
+    '<div style="margin-top:18px"><button class="btn btn-gold" data-act="add-teacher" style="max-width:280px">+ Add Teacher</button></div>';
+}
+function teacherForm(existing) {
+  const isEdit = !!existing;
+  openModal(
+    '<h2>' + (isEdit ? 'Edit Teacher' : 'Add Teacher') + '</h2>' +
+    '<label for="tt-name">Full Name</label>' +
+    '<input id="tt-name" type="text" maxlength="60" value="' + esc(existing ? existing.name : '') + '" required>' +
+    '<label for="tt-user">Username</label>' +
+    '<input id="tt-user" type="text" maxlength="32" autocapitalize="none" spellcheck="false" value="' + esc(existing ? existing.username : '') + '" ' + (isEdit ? 'disabled' : '') + ' required>' +
+    (isEdit
+      ? '<p class="hint">Username cannot be changed.</p>'
+      : '<label for="tt-pass">Initial Password</label>' +
+        '<input id="tt-pass" type="text" maxlength="64" value="teacher123" required>' +
+        '<p class="hint">The teacher can change this after signing in.</p>') +
+    '<p class="err" id="tt-err"></p>' +
+    '<div class="mfoot">' +
+      '<button class="sbtn" data-cancel>Cancel</button>' +
+      '<button class="sbtn sbtn-gold" id="tt-save">Save</button>' +
+    '</div>',
+    bg => {
+      bg.querySelector('[data-cancel]').addEventListener('click', () => closeModal(bg));
+      bg.querySelector('#tt-save').addEventListener('click', async () => {
+        const name = clean(bg.querySelector('#tt-name').value);
+        const uname = clean(bg.querySelector('#tt-user').value).toLowerCase();
+        const err = bg.querySelector('#tt-err');
+        if (!name) { err.textContent = 'Name is required.'; err.classList.add('show'); return; }
+        if (!uname) { err.textContent = 'Username is required.'; err.classList.add('show'); return; }
+        if (!/^[a-z0-9._-]{3,32}$/.test(uname)) { err.textContent = 'Username: 3–32 chars, letters/digits/._- only.'; err.classList.add('show'); return; }
+        if (DB.users.some(u => u.username.toLowerCase() === uname && u.id !== (existing && existing.id))) {
+          err.textContent = 'That username is already taken.'; err.classList.add('show'); return;
+        }
+        if (isEdit) {
+          await Store.saveTeacher(Object.assign({}, existing, { name }));
+        } else {
+          const pw = bg.querySelector('#tt-pass').value;
+          if (pw.length < 6) { err.textContent = 'Password must be at least 6 characters.'; err.classList.add('show'); return; }
+          const salt = randomSalt();
+          const hash = await hashPassword(pw, salt);
+          await Store.saveTeacher({
+            id: uid(), role: 'teacher', username: uname, name,
+            salt, hash, active: true, mustChange: false, createdAt: Date.now()
+          });
+        }
+        closeModal(bg);
+        renderDashBody();
+        toast(isEdit ? 'Teacher updated.' : 'Teacher created.', 'ok');
+      });
+    }
+  );
+}
+function resetTeacherPassword(t) {
+  openModal(
+    '<h2>Reset Password</h2>' +
+    '<p class="modal-sub">Set a new password for <strong>' + esc(t.name) + '</strong>.</p>' +
+    '<label for="rp-new">New Password</label>' +
+    '<input id="rp-new" type="text" maxlength="64" value="teacher123">' +
+    '<p class="err" id="rp-err"></p>' +
+    '<div class="mfoot">' +
+      '<button class="sbtn" data-cancel>Cancel</button>' +
+      '<button class="sbtn sbtn-gold" id="rp-go">Reset</button>' +
+    '</div>',
+    bg => {
+      bg.querySelector('[data-cancel]').addEventListener('click', () => closeModal(bg));
+      bg.querySelector('#rp-go').addEventListener('click', async () => {
+        const pw = bg.querySelector('#rp-new').value;
+        const err = bg.querySelector('#rp-err');
+        if (pw.length < 6) { err.textContent = 'Password must be at least 6 characters.'; err.classList.add('show'); return; }
+        await changePassword(t.id, pw);
+        closeModal(bg);
+        toast('Password reset for ' + t.name + '.', 'ok');
+      });
+    }
+  );
+}
+
+/* ---------- STUDENTS ---------- */
+let studentSearch = '';
+let studentSort = { key: 'name', dir: 1 };
+
+function renderStudents() {
+  const canManage = CURRENT_USER.role === 'super' || CURRENT_USER.role === 'teacher';
+  let list = DB.students.slice();
+  if (studentSearch) {
+    const q = studentSearch.toLowerCase();
+    list = list.filter(s =>
+      s.name.toLowerCase().includes(q) || s.code.toLowerCase().includes(q) || (s.klass || '').toLowerCase().includes(q));
+  }
+  list.sort((a, b) => {
+    const k = studentSort.key;
+    const va = (a[k] || '').toString().toLowerCase();
+    const vb = (b[k] || '').toString().toLowerCase();
+    return va < vb ? -studentSort.dir : va > vb ? studentSort.dir : 0;
+  });
+  $('#dash-body').innerHTML =
+    '<div class="sec">Student Registry (' + DB.students.length + ')</div>' +
+    '<div class="note">🔒 <strong>Strict Registry Mode is ON.</strong> Students must be registered here before they can start any exam. Add students manually, bulk-import them by CSV, or use the + Add Student button below.</div>' +
+    '<div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:16px">' +
+      '<input id="st-search" type="text" placeholder="Search name, code or class…" maxlength="60" value="' + esc(studentSearch) + '" style="flex:1;min-width:180px;margin:0">' +
+      (canManage
+        ? '<button class="sbtn sbtn-gold" data-act="add-student">+ Add Student</button>' +
+          '<button class="sbtn" data-act="bulk-students">📥 Bulk Import</button>' +
+          '<button class="sbtn" data-act="export-students">⬇ CSV</button>'
+        : '') +
+    '</div>' +
+    (list.length
+      ? '<div class="tw"><table><thead><tr>' +
+          '<th data-sort="name">Name<span class="arw">▲</span></th>' +
+          '<th data-sort="code">Code<span class="arw">▲</span></th>' +
+          '<th data-sort="klass">Class<span class="arw">▲</span></th>' +
+          '<th class="no-sort">Attempts</th>' +
+          (canManage ? '<th class="no-sort">Actions</th>' : '') +
+        '</tr></thead><tbody>' +
+        list.map(s => {
+          const attempts = DB.results.filter(r => r.studentCode.toLowerCase() === s.code.toLowerCase()).length;
+          return '<tr>' +
+            '<td>' + esc(s.name) + '</td>' +
+            '<td>' + esc(s.code) + '</td>' +
+            '<td>' + esc(s.klass || '—') + '</td>' +
+            '<td>' + attempts + '</td>' +
+            (canManage
+              ? '<td><button class="sbtn" data-act="view-student" data-code="' + esc(s.code) + '">History</button> ' +
+                '<button class="sbtn" data-act="edit-student" data-code="' + esc(s.code) + '">Edit</button> ' +
+                '<button class="sbtn sbtn-red" data-act="del-student" data-code="' + esc(s.code) + '">×</button></td>'
+              : '') +
+          '</tr>';
+        }).join('') + '</tbody></table></div>'
+      : emptyState('🎓', DB.students.length ? 'No matching students.' : 'No students yet.',
+          'Students are added automatically when they take an exam, or you can add them manually.'));
+
+  const si = $('#st-search');
+  if (si) {
+    let t = null;
+    si.addEventListener('input', () => {
+      clearTimeout(t);
+      t = setTimeout(() => { studentSearch = si.value; renderStudents(); }, 220);
+    });
+  }
+  $$('#dash-body th[data-sort]').forEach(th => {
+    th.addEventListener('click', () => {
+      const k = th.dataset.sort;
+      if (studentSort.key === k) studentSort.dir *= -1;
+      else { studentSort.key = k; studentSort.dir = 1; }
+      renderStudents();
+    });
+  });
+}
+function studentForm(existing) {
+  const isEdit = !!existing;
+  openModal(
+    '<h2>' + (isEdit ? 'Edit Student' : 'Add Student') + '</h2>' +
+    '<label for="ss-name">Full Name</label>' +
+    '<input id="ss-name" type="text" maxlength="60" value="' + esc(existing ? existing.name : '') + '" required>' +
+    '<label for="ss-code">Student Code / Matric No.</label>' +
+    '<input id="ss-code" type="text" maxlength="32" autocapitalize="characters" value="' + esc(existing ? existing.code : '') + '" required>' +
+    '<label for="ss-klass">Class / Level</label>' +
+    '<input id="ss-klass" type="text" maxlength="20" value="' + esc(existing ? existing.klass : '') + '">' +
+    '<label for="ss-email">Email (optional)</label>' +
+    '<input id="ss-email" type="email" maxlength="80" value="' + esc(existing ? existing.email : '') + '">' +
+    '<p class="err" id="ss-err"></p>' +
+    '<div class="mfoot">' +
+      '<button class="sbtn" data-cancel>Cancel</button>' +
+      '<button class="sbtn sbtn-gold" id="ss-save">Save</button>' +
+    '</div>',
+    bg => {
+      bg.querySelector('[data-cancel]').addEventListener('click', () => closeModal(bg));
+      bg.querySelector('#ss-save').addEventListener('click', async () => {
+        const name = clean(bg.querySelector('#ss-name').value);
+        const code = clean(bg.querySelector('#ss-code').value).toUpperCase();
+        const klass = clean(bg.querySelector('#ss-klass').value);
+        const email = clean(bg.querySelector('#ss-email').value);
+        const err = bg.querySelector('#ss-err');
+        if (!name) { err.textContent = 'Name is required.'; err.classList.add('show'); return; }
+        if (!code) { err.textContent = 'Student code is required.'; err.classList.add('show'); return; }
+        if (DB.students.some(s => s.code.toUpperCase() === code && s.code.toUpperCase() !== (existing ? existing.code.toUpperCase() : ''))) {
+          err.textContent = 'That student code already exists.'; err.classList.add('show'); return;
+        }
+        const rec = existing
+          ? Object.assign({}, existing, { name, code, klass, email })
+          : { id: uid(), name, code, klass, email, createdAt: Date.now() };
+        if (existing && existing.code.toUpperCase() !== code) await Store.deleteStudent(existing.code);
+        await Store.saveStudent(rec);
+        closeModal(bg);
+        renderStudents();
+        toast(isEdit ? 'Student updated.' : 'Student added.', 'ok');
+      });
+    }
+  );
+}
+function bulkImportStudents() {
+  openModal(
+    '<h2>Bulk Import Students</h2>' +
+    '<p class="modal-sub">Paste one student per line:<br><code>John Doe, AIS/2024/001, SS2A</code><br>Email is an optional 4th field.</p>' +
+    '<label for="bi-text">Student Lines</label>' +
+    '<textarea id="bi-text" rows="9" maxlength="20000" placeholder="John Doe, AIS/2024/001, SS2A&#10;Jane Smith, AIS/2024/002, SS2B"></textarea>' +
+    '<div id="bi-preview"></div>' +
+    '<p class="err" id="bi-err"></p>' +
+    '<div class="mfoot">' +
+      '<button class="sbtn" data-cancel>Cancel</button>' +
+      '<button class="sbtn sbtn-gold" id="bi-go">Import</button>' +
+    '</div>',
+    bg => {
+      const ta = bg.querySelector('#bi-text');
+      const prev = bg.querySelector('#bi-preview');
+      const parse = () => {
+        const lines = ta.value.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+        const seen = new Set();
+        let ok = 0, dup = 0, bad = 0;
+        const parsed = [];
+        for (const line of lines) {
+          const parts = line.split(',').map(p => clean(p));
+          if (parts.length < 2 || !parts[0] || !parts[1]) { bad++; continue; }
+          const code = parts[1].toUpperCase();
+          if (seen.has(code) || DB.students.some(s => s.code.toUpperCase() === code)) { dup++; continue; }
+          seen.add(code);
+          parsed.push({ name: parts[0], code, klass: parts[2] || '', email: parts[3] || '' });
+          ok++;
+        }
+        prev.innerHTML = '<div class="hint" style="margin:6px 0 14px">' +
+          '<strong style="color:var(--ok)">' + ok + ' valid</strong> · ' +
+          '<strong style="color:var(--accent)">' + dup + ' duplicate</strong> · ' +
+          '<strong style="color:var(--err)">' + bad + ' invalid</strong></div>';
+        return parsed;
+      };
+      ta.addEventListener('input', parse);
+      parse();
+      bg.querySelector('[data-cancel]').addEventListener('click', () => closeModal(bg));
+      bg.querySelector('#bi-go').addEventListener('click', async () => {
+        const parsed = parse();
+        if (!parsed.length) {
+          const err = bg.querySelector('#bi-err');
+          err.textContent = 'No valid students to import.';
+          err.classList.add('show');
+          return;
+        }
+        const res = await Store.bulkImportStudents(parsed);
+        closeModal(bg);
+        renderStudents();
+        toast('Added ' + res.added + ' · skipped ' + res.skipped + ' · invalid ' + res.invalid, 'ok');
+      });
+    }
+  );
+}
+async function viewStudentHistory(student) {
+  if (!student) return;
+  const all = await Store.getResults();
+  const results = all.filter(r => r.studentCode.toLowerCase() === student.code.toLowerCase())
+    .sort((a, b) => (b.submittedAt || 0) - (a.submittedAt || 0));
+  openModal(
+    '<h2>' + esc(student.name) + '</h2>' +
+    '<p class="modal-sub">' + esc(student.code) + ' · ' + esc(student.klass || 'No class') + ' · ' + results.length + ' attempt(s)</p>' +
+    (results.length
+      ? '<div class="tw"><table><thead><tr>' +
+          '<th class="no-sort">Exam</th><th class="no-sort">Score</th><th class="no-sort">Result</th><th class="no-sort">Date</th>' +
+        '</tr></thead><tbody>' +
+        results.map(r =>
+          '<tr><td>' + esc(r.examTitle) + '</td><td>' + r.pct + '%</td>' +
+          '<td class="' + (r.passed ? 'pass' : 'fail') + '">' + (r.terminated ? 'TERMINATED' : (r.passed ? 'PASS' : 'FAIL')) + '</td>' +
+          '<td>' + esc(fmtDateShort(r.submittedAt)) + '</td></tr>'
+        ).join('') + '</tbody></table></div>'
+      : emptyState('📄', 'No attempts yet.', 'This student has not taken any exams.')) +
+    '<div class="mfoot"><button class="sbtn" data-close>Close</button></div>',
+    bg => bg.querySelector('[data-close]').addEventListener('click', () => closeModal(bg))
+  );
+}
+
+/* ---------- EXAMS ---------- */
+function examStatus(ex) {
+  const now = Date.now();
+  if (ex.status === 'closed') return 'closed';
+  if (ex.status === 'draft') return 'draft';
+  if (ex.windowStart && now < ex.windowStart) return 'scheduled';
+  if (ex.windowEnd && now > ex.windowEnd) return 'closed';
+  return 'published';
+}
+function statusBadge(st) {
+  const map = { draft:'b-draft', published:'b-pub', closed:'b-closed', scheduled:'b-sched' };
+  const lbl = { draft:'Draft', published:'Published', closed:'Closed', scheduled:'Scheduled' };
+  return '<span class="badge ' + map[st] + '">' + lbl[st] + '</span>';
+}
+function visibleExams() {
+  if (CURRENT_USER.role === 'super') return DB.exams;
+  return DB.exams.filter(e => e.teacherId === CURRENT_USER.id);
+}
+function renderExams() {
+  const list = visibleExams().slice().sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  $('#dash-body').innerHTML =
+    '<div class="sec">' + (CURRENT_USER.role === 'super' ? 'All Exams' : 'My Exams') + ' (' + list.length + ')</div>' +
+    (list.length
+      ? list.map(ex => {
+          const st = examStatus(ex);
+          const ans = ex.questions.filter(q => q.answerId).length;
+          const ready = ans === ex.questions.length && ex.questions.length > 0;
+          const attempts = DB.results.filter(r => r.examId === ex.id).length;
+          return '<div class="item">' +
+            '<h3>' + esc(ex.title) + ' ' + statusBadge(st) + '</h3>' +
+            '<div class="meta">' +
+              '📚 ' + esc(ex.subject || 'General') + ' · 🎓 ' + esc(ex.klass || 'All') + ' · 👤 ' + esc(ex.teacherName || '—') + '<br>' +
+              '📝 ' + ex.questions.length + ' questions · ⏱ ' + ex.durationMinutes + ' min · 🎯 ' + ex.passScore + '% · 📊 ' + attempts + ' attempt(s)' +
+              (ex.windowStart ? '<br>🕐 Opens ' + esc(fmtDate(ex.windowStart)) : '') +
+              (ex.windowEnd ? ' · Closes ' + esc(fmtDate(ex.windowEnd)) : '') +
+            '</div>' +
+            '<div class="status-line" style="color:' + (ready ? 'var(--ok)' : 'var(--accent)') + '">' +
+              (ready ? '✓ Answer key complete' : '⚠ ' + ans + '/' + ex.questions.length + ' answers set') +
+            '</div>' +
+            '<div class="acts">' +
+              '<button class="sbtn" data-act="edit-exam" data-id="' + ex.id + '">Edit</button>' +
+              '<button class="sbtn" data-act="exam-answers" data-id="' + ex.id + '">Answer Key</button>' +
+              '<button class="sbtn" data-act="exam-status" data-id="' + ex.id + '">' + (st === 'published' ? 'Close' : 'Publish') + '</button>' +
+              '<button class="sbtn sbtn-red" data-act="del-exam" data-id="' + ex.id + '">Delete</button>' +
+            '</div></div>';
+        }).join('')
+      : emptyState('📋', 'No exams yet.', 'Create your first exam to get started.'));
+}
+async function examStatusToggle(ex) {
+  const st = examStatus(ex);
+  const upd = JSON.parse(JSON.stringify(ex));
+  if (st === 'published' || st === 'scheduled') {
+    upd.status = 'closed';
+    await Store.saveExam(upd);
+    toast('Exam closed.', 'ok');
+  } else {
+    if (!upd.questions.length) { toast('Add questions before publishing.', 'err'); return; }
+    if (upd.questions.some(q => !q.answerId)) { toast('Set the answer key for every question first.', 'err'); return; }
+    upd.status = 'published';
+    await Store.saveExam(upd);
+    toast('Exam published.', 'ok');
+  }
+  renderExams();
+}
+
+/* ---------- RESULTS ---------- */
+let resFilters = { examId:'', teacherId:'', klass:'', verdict:'', from:'', to:'', q:'' };
+let resSort = { key: 'submittedAt', dir: -1 };
+let resPage = 1;
+
+function scopedResults() {
+  return CURRENT_USER.role === 'super'
+    ? DB.results.slice()
+    : DB.results.filter(r => r.teacherId === CURRENT_USER.id);
+}
+function filteredResults() {
+  let list = scopedResults();
+  const f = resFilters;
+  if (f.examId) list = list.filter(r => r.examId === f.examId);
+  if (f.teacherId) list = list.filter(r => r.teacherId === f.teacherId);
+  if (f.klass) list = list.filter(r => (r.studentClass || '') === f.klass);
+  if (f.verdict === 'pass') list = list.filter(r => r.passed && !r.terminated);
+  if (f.verdict === 'fail') list = list.filter(r => !r.passed && !r.terminated);
+  if (f.verdict === 'term') list = list.filter(r => r.terminated);
+  if (f.from) list = list.filter(r => r.submittedAt >= new Date(f.from).getTime());
+  if (f.to) list = list.filter(r => r.submittedAt <= new Date(f.to).getTime() + 86399999);
+  if (f.q) {
+    const q = f.q.toLowerCase();
+    list = list.filter(r =>
+      (r.studentName || '').toLowerCase().includes(q) ||
+      (r.studentCode || '').toLowerCase().includes(q) ||
+      (r.examTitle || '').toLowerCase().includes(q) ||
+      (r.teacherName || '').toLowerCase().includes(q));
+  }
+  const k = resSort.key;
+  list.sort((a, b) => {
+    let va = a[k], vb = b[k];
+    if (typeof va === 'string') va = va.toLowerCase();
+    if (typeof vb === 'string') vb = vb.toLowerCase();
+    if (va < vb) return -resSort.dir;
+    if (va > vb) return resSort.dir;
+    return 0;
+  });
+  return list;
+}
+function renderResults() {
+  const all = filteredResults();
+  const totalPages = Math.max(1, Math.ceil(all.length / PAGE_SIZE));
+  if (resPage > totalPages) resPage = totalPages;
+  const start = (resPage - 1) * PAGE_SIZE;
+  const page = all.slice(start, start + PAGE_SIZE);
+  const exams = scopedResults();
+  const examOpts = [...new Set(exams.map(r => r.examId))].map(id => {
+    const r = exams.find(x => x.examId === id);
+    return { id, title: r.examTitle };
+  });
+  const teacherOpts = CURRENT_USER.role === 'super'
+    ? [...new Set(exams.map(r => r.teacherId))].map(id => {
+        const r = exams.find(x => x.teacherId === id);
+        return { id, name: r.teacherName };
+      })
+    : [];
+  const klassOpts = [...new Set(scopedResults().map(r => r.studentClass).filter(Boolean))];
+  const f = resFilters;
+  $('#dash-body').innerHTML =
+    '<div class="sec">Results (' + all.length + ')</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px">' +
+      '<input id="rf-q" type="text" placeholder="Search…" maxlength="60" value="' + esc(f.q) + '" style="margin:0">' +
+      '<select id="rf-exam" style="margin:0"><option value="">All exams</option>' +
+        examOpts.map(o => '<option value="' + esc(o.id) + '"' + (f.examId === o.id ? ' selected' : '') + '>' + esc(o.title) + '</option>').join('') +
+      '</select>' +
+      (CURRENT_USER.role === 'super'
+        ? '<select id="rf-teacher" style="margin:0"><option value="">All teachers</option>' +
+            teacherOpts.map(o => '<option value="' + esc(o.id) + '"' + (f.teacherId === o.id ? ' selected' : '') + '>' + esc(o.name) + '</option>').join('') +
+          '</select>' : '') +
+      '<select id="rf-klass" style="margin:0"><option value="">All classes</option>' +
+        klassOpts.map(k => '<option value="' + esc(k) + '"' + (f.klass === k ? ' selected' : '') + '>' + esc(k) + '</option>').join('') +
+      '</select>' +
+      '<select id="rf-verdict" style="margin:0">' +
+        '<option value="">All verdicts</option>' +
+        '<option value="pass"' + (f.verdict === 'pass' ? ' selected' : '') + '>Passed</option>' +
+        '<option value="fail"' + (f.verdict === 'fail' ? ' selected' : '') + '>Failed</option>' +
+        '<option value="term"' + (f.verdict === 'term' ? ' selected' : '') + '>Terminated</option>' +
+      '</select>' +
+      '<input id="rf-from" type="date" value="' + esc(f.from) + '" style="margin:0">' +
+      '<input id="rf-to" type="date" value="' + esc(f.to) + '" style="margin:0">' +
+    '</div>' +
+    '<div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:16px">' +
+      '<button class="sbtn" data-act="res-clear">Clear Filters</button>' +
+      '<button class="sbtn" data-act="res-export">⬇ Export CSV</button>' +
+    '</div>' +
+    (page.length
+      ? '<div class="tw"><table><thead><tr>' +
+          th('studentName','Student') + th('studentCode','Code') + th('studentClass','Class') +
+          th('examTitle','Exam') + th('teacherName','Teacher') + th('pct','Score') +
+          '<th class="no-sort">Result</th>' +
+          '<th class="no-sort">Incidents</th>' +
+          th('timeUsed','Time') + th('submittedAt','Date') +
+          '<th class="no-sort"></th>' +
+        '</tr></thead><tbody>' +
+        page.map(r =>
+          '<tr>' +
+            '<td>' + esc(r.studentName) + '</td>' +
+            '<td>' + esc(r.studentCode) + '</td>' +
+            '<td>' + esc(r.studentClass || '—') + '</td>' +
+            '<td>' + esc(r.examTitle) + '</td>' +
+            '<td>' + esc(r.teacherName || '—') + '</td>' +
+            '<td>' + r.pct + '%</td>' +
+            '<td class="' + (r.terminated ? 'fail' : (r.passed ? 'pass' : 'fail')) + '">' +
+              (r.terminated ? 'TERMINATED' : (r.passed ? 'PASS' : 'FAIL')) + '</td>' +
+            '<td>' + (r.incidents && r.incidents.length ? '<span style="color:var(--err)">⚠ ' + r.incidents.length + '</span>' : '—') + '</td>' +
+            '<td>' + esc(fmtTime(r.timeUsed || 0)) + '</td>' +
+            '<td>' + esc(fmtDateShort(r.submittedAt)) + '</td>' +
+            '<td><button class="sbtn" data-act="view-result" data-id="' + r.id + '">View</button> ' +
+              '<button class="sbtn sbtn-red" data-act="del-result" data-id="' + r.id + '">×</button></td>' +
+          '</tr>'
+        ).join('') + '</tbody></table></div>' +
+        '<div class="pager">' +
+          '<button class="sbtn" data-act="res-page" data-page="' + (resPage - 1) + '"' + (resPage <= 1 ? ' disabled' : '') + '>← Prev</button>' +
+          '<span>Page ' + resPage + ' of ' + totalPages + '</span>' +
+          '<button class="sbtn" data-act="res-page" data-page="' + (resPage + 1) + '"' + (resPage >= totalPages ? ' disabled' : '') + '>Next →</button>' +
+        '</div>'
+      : emptyState('📊', 'No results match your filters.', 'Try clearing the filters or wait for students to complete exams.'));
+
+  const bind = (id, key, ev) => {
+    const el = $('#' + id);
+    if (!el) return;
+    el.addEventListener(ev || 'change', () => {
+      resFilters[key] = el.value;
+      resPage = 1;
+      renderResults();
+      const again = $('#' + id);
+      if (again && (ev === 'input')) { again.focus(); again.setSelectionRange(again.value.length, again.value.length); }
+    });
+  };
+  bind('rf-q', 'q', 'input');
+  bind('rf-exam', 'examId');
+  bind('rf-teacher', 'teacherId');
+  bind('rf-klass', 'klass');
+  bind('rf-verdict', 'verdict');
+  bind('rf-from', 'from');
+  bind('rf-to', 'to');
+  $$('#dash-body th[data-sort]').forEach(th => {
+    th.addEventListener('click', () => {
+      const k = th.dataset.sort;
+      if (resSort.key === k) resSort.dir *= -1;
+      else { resSort.key = k; resSort.dir = 1; }
+      renderResults();
+    });
+  });
+}
+function th(key, label) {
+  const on = resSort.key === key;
+  return '<th data-sort="' + key + '" class="' + (on ? 'on' : '') + '">' + esc(label) +
+    '<span class="arw">' + (on && resSort.dir < 0 ? '▼' : '▲') + '</span></th>';
+}
+function exportResultsCSV() {
+  const list = filteredResults();
+  const rows = [[
+    'Student','Code','Class','Exam','Subject','Teacher',
+    'Score %','Correct','Wrong','Unanswered','Total',
+    'Result','Terminated','Incidents','Time Used','Date'
+  ]];
+  list.forEach(r => rows.push([
+    r.studentName, r.studentCode, r.studentClass || '', r.examTitle, r.subject || '',
+    r.teacherName || '', r.pct, r.correct, r.wrong, r.unanswered, r.total,
+    r.terminated ? 'TERMINATED' : (r.passed ? 'PASS' : 'FAIL'),
+    r.terminated ? 'Yes' : 'No',
+    (r.incidents || []).length, fmtTime(r.timeUsed || 0), fmtDate(r.submittedAt)
+  ]));
+  downloadCSV('cbt-results-' + new Date().toISOString().slice(0, 10) + '.csv', rows);
+  toast('Exported ' + list.length + ' result(s).', 'ok');
+}
+
+/* ---------- ANALYTICS ---------- */
+function renderAnalytics() {
+  const myExams = DB.exams.filter(e => e.teacherId === CURRENT_USER.id);
+  const myResults = DB.results.filter(r => r.teacherId === CURRENT_USER.id);
+  const passed = myResults.filter(r => r.passed).length;
+  const rate = myResults.length ? Math.round((passed / myResults.length) * 100) : 0;
+  const avg = myResults.length ? Math.round(myResults.reduce((a, r) => a + r.pct, 0) / myResults.length) : 0;
+  const best = myResults.length ? Math.max.apply(null, myResults.map(r => r.pct)) : 0;
+  const studentsTested = new Set(myResults.map(r => r.studentCode)).size;
+
+  let html = '<div class="stats">' +
+    stat(myExams.length, 'Exams Created') +
+    stat(studentsTested, 'Students Tested') +
+    stat(avg + '%', 'Average Score') +
+    stat(rate + '%', 'Pass Rate') +
+    stat(best + '%', 'Highest Score') +
+  '</div>';
+
+  myExams.forEach(ex => {
+    const results = myResults.filter(r => r.examId === ex.id);
+    if (!results.length) return;
+    html += '<div class="sec">' + esc(ex.title) + '</div>';
+    html += '<div class="tw"><table><thead><tr>' +
+      '<th class="no-sort">#</th><th class="no-sort">Question</th>' +
+      '<th class="no-sort">Correct</th><th class="no-sort">Attempts</th>' +
+      '<th class="no-sort">% Correct</th>' +
+    '</tr></thead><tbody>';
+    ex.questions.forEach((q, i) => {
+      let correct = 0, attempts = 0;
+      results.forEach(r => {
+        if (r.answers && r.answers[q.id] !== undefined) {
+          attempts++;
+          if (r.answers[q.id] === q.answerId) correct++;
+        }
+      });
+      const pct = attempts ? Math.round((correct / attempts) * 100) : 0;
+      const color = pct >= 70 ? 'var(--ok)' : pct >= 40 ? 'var(--accent)' : 'var(--err)';
+      html += '<tr><td>' + (i + 1) + '</td>' +
+        '<td style="white-space:normal;max-width:320px">' + esc(q.text.length > 100 ? q.text.slice(0, 100) + '…' : q.text) + '</td>' +
+        '<td>' + correct + '</td><td>' + attempts + '</td>' +
+        '<td style="color:' + color + ';font-weight:700">' + pct + '%</td></tr>';
+    });
+    html += '</tbody></table></div>';
+  });
+  if (!myExams.length) html += emptyState('📋', 'No exams yet.', 'Create an exam to see analytics.');
+  else if (!myResults.length) html += emptyState('📈', 'No data yet.', 'Analytics will appear after students complete your exams.');
+  $('#dash-body').innerHTML = html;
+}
+
+/* ---------- SETTINGS ---------- */
+function renderSettings() {
+  const s = DB.settings;
+  $('#dash-body').innerHTML =
+    '<div class="sec">School Identity</div>' +
+    '<label for="se-name">School Name</label>' +
+    '<input id="se-name" type="text" maxlength="80" value="' + esc(s.schoolName) + '">' +
+    '<label for="se-motto">Motto / Tagline</label>' +
+    '<input id="se-motto" type="text" maxlength="80" value="' + esc(s.motto) + '">' +
+    '<label for="se-addr">School Address (for result slip)</label>' +
+    '<input id="se-addr" type="text" maxlength="120" value="' + esc(s.address) + '">' +
+    '<label for="se-officer">Exam Officer Name (for result slip)</label>' +
+    '<input id="se-officer" type="text" maxlength="60" value="' + esc(s.examOfficer) + '">' +
+    '<div class="sec">Logo</div>' +
+    '<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:14px">' +
+      '<div class="crest sm" style="margin:0" id="se-logo-preview">🏫</div>' +
+      '<div style="flex:1;min-width:200px">' +
+        '<input type="file" id="se-logo" accept="image/png,image/jpeg,image/jpg,image/svg+xml">' +
+        '<p class="hint" style="margin:4px 0 8px">PNG / JPG / SVG, max 500 KB. Stored locally as a data URL.</p>' +
+        '<button class="sbtn" data-act="remove-logo">Remove Logo</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="sec">Appearance</div>' +
+    '<label for="se-accent">Accent Colour</label>' +
+    '<input id="se-accent" type="color" value="' + esc(s.accent) + '" style="max-width:120px">' +
+    '<div class="sec">Exam Defaults</div>' +
+    '<div class="frow">' +
+      '<div><label for="se-dur">Default Duration (minutes)</label>' +
+        '<input id="se-dur" type="number" min="1" max="600" value="' + s.defaultDuration + '"></div>' +
+      '<div><label for="se-pass">Default Pass Mark (%)</label>' +
+        '<input id="se-pass" type="number" min="1" max="100" value="' + s.defaultPass + '"></div>' +
+    '</div>' +
+    '<div class="sec">Exam Behaviour</div>' +
+    '<label class="chk"><input type="checkbox" id="se-showans"' + (s.showAnswers ? ' checked' : '') + '><span>Show correct answers to students after submission</span></label>' +
+    '<label class="chk"><input type="checkbox" id="se-review"' + (s.allowReview ? ' checked' : '') + '><span>Allow students to review answers after submission</span></label>' +
+    '<label class="chk"><input type="checkbox" id="se-strict"' + (s.strictAntiCheat ? ' checked' : '') + '><span>Enable strict anti-cheat mode</span></label>' +
+    '<label for="se-thresh">Anti-cheat incident threshold (auto-terminate exam)</label>' +
+    '<input id="se-thresh" type="number" min="1" max="50" value="' + s.incidentThreshold + '">' +
+    '<div class="sec">Danger Zone</div>' +
+    '<div style="display:flex;gap:9px;flex-wrap:wrap">' +
+      '<button class="sbtn" data-act="export-all">⬇ Export All Results (CSV)</button>' +
+      '<button class="sbtn sbtn-red" data-act="clear-db">🗑 Clear Entire Database</button>' +
+    '</div>';
+
+  const bind = (id, key, transform) => {
+    const el = $('#' + id);
+    if (!el) return;
+    el.addEventListener(el.type === 'checkbox' ? 'change' : 'input', () => {
+      let v = el.type === 'checkbox' ? el.checked : el.value;
+      if (transform) v = transform(v);
+      Store.saveSettings({ [key]: v });
+      applySettings();
+    });
+  };
+  bind('se-name', 'schoolName');
+  bind('se-motto', 'motto');
+  bind('se-addr', 'address');
+  bind('se-officer', 'examOfficer');
+  bind('se-accent', 'accent');
+  bind('se-dur', 'defaultDuration', v => Math.max(1, parseInt(v) || 1));
+  bind('se-pass', 'defaultPass', v => Math.min(100, Math.max(1, parseInt(v) || 50)));
+  bind('se-showans', 'showAnswers');
+  bind('se-review', 'allowReview');
+  bind('se-strict', 'strictAntiCheat');
+  bind('se-thresh', 'incidentThreshold', v => Math.max(1, parseInt(v) || 5));
+
+  crestHTML('se-logo-preview');
+  $('#se-logo').addEventListener('change', e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    if (f.size > MAX_LOGO_B) { toast('Logo must be under 500 KB.', 'err'); e.target.value = ''; return; }
+    if (!/^image\/(png|jpeg|jpg|svg\+xml)$/.test(f.type)) { toast('Please choose a PNG, JPG or SVG file.', 'err'); e.target.value = ''; return; }
+    const r = new FileReader();
+    r.onload = async () => {
+      toast('Uploading logo…', '');
+      await Store.uploadLogo(r.result);
+      applySettings();
+      crestHTML('se-logo-preview');
+      toast('Logo updated.', 'ok');
+    };
+    r.onerror = () => toast('Could not read that file.', 'err');
+    r.readAsDataURL(f);
+  });
+}
+function applySettings() {
+  const s = DB.settings;
+  document.documentElement.style.setProperty('--accent', s.accent);
+  document.documentElement.style.setProperty('--accent2', lighten(s.accent, 0.35));
+  document.title = s.schoolName + ' — CBT Centre';
+  renderLanding();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   EXAM EDITOR
+   ═══════════════════════════════════════════════════════════════ */
+let editingExam = null;
+function newExamDraft() {
+  return {
+    id: uid(), title: '', subject: '', klass: '',
+    teacherId: CURRENT_USER.id,
+    teacherName: CURRENT_USER.name || CURRENT_USER.username,
+    durationMinutes: DB.settings.defaultDuration,
+    passScore: DB.settings.defaultPass,
+    shuffleQuestions: false, shuffleOptions: false,
+    showResultImmediately: true,
+    windowStart: null, windowEnd: null,
+    instructions: '',
+    questions: [],
+    createdAt: Date.now(),
+    status: 'draft'
+  };
+}
+function openExamEditor(examId) {
+  if (examId) {
+    const ex = DB.exams.find(e => e.id === examId);
+    if (!ex) return;
+    editingExam = JSON.parse(JSON.stringify(ex));
+  } else editingExam = newExamDraft();
+  $('#ed-title').textContent = examId ? 'Edit Exam' : 'New Exam';
+  renderExamEditor();
+  showScreen('scr-examedit');
+}
+function renderExamEditor() {
+  const ex = editingExam;
+  const presets = [10, 15, 30, 45, 60, 90, 120];
+  $('#ed-body').innerHTML =
+    '<div class="sec">Exam Details</div>' +
+    '<label for="ex-title">Exam Title *</label>' +
+    '<input id="ex-title" type="text" maxlength="90" value="' + esc(ex.title) + '" placeholder="e.g. Mathematics SS2 Mid-Term">' +
+    '<div class="frow">' +
+      '<div><label for="ex-subject">Subject</label><input id="ex-subject" type="text" maxlength="40" value="' + esc(ex.subject) + '"></div>' +
+      '<div><label for="ex-klass">Class / Level</label><input id="ex-klass" type="text" maxlength="30" value="' + esc(ex.klass) + '"></div>' +
+    '</div>' +
+    '<div class="sec">Timing &amp; Scoring</div>' +
+    '<label for="ex-dur">Duration (minutes) *</label>' +
+    '<input id="ex-dur" type="number" min="1" max="600" value="' + ex.durationMinutes + '">' +
+    '<div style="display:flex;gap:7px;flex-wrap:wrap;margin:-6px 0 16px">' +
+      presets.map(p => '<button class="sbtn" data-act="preset-dur" data-min="' + p + '">' + p + 'm</button>').join('') +
+    '</div>' +
+    '<label for="ex-pass">Pass Mark (%) *</label>' +
+    '<input id="ex-pass" type="number" min="1" max="100" value="' + ex.passScore + '">' +
+    '<div class="sec">Exam Window (optional)</div>' +
+    '<div class="frow">' +
+      '<div><label for="ex-wstart">Opens At</label><input id="ex-wstart" type="datetime-local" value="' + toLocalInput(ex.windowStart) + '"></div>' +
+      '<div><label for="ex-wend">Closes At</label><input id="ex-wend" type="datetime-local" value="' + toLocalInput(ex.windowEnd) + '"></div>' +
+    '</div>' +
+    '<p class="hint">Leave blank for an always-open exam.</p>' +
+    '<div class="sec">Options</div>' +
+    '<label class="chk"><input type="checkbox" id="ex-sq"' + (ex.shuffleQuestions ? ' checked' : '') + '><span>Shuffle question order</span></label>' +
+    '<label class="chk"><input type="checkbox" id="ex-so"' + (ex.shuffleOptions ? ' checked' : '') + '><span>Shuffle answer options</span></label>' +
+    '<label class="chk"><input type="checkbox" id="ex-show"' + (ex.showResultImmediately ? ' checked' : '') + '><span>Show result immediately after submission</span></label>' +
+    '<div class="sec">Instructions for Students</div>' +
+    '<textarea id="ex-instr" rows="4" maxlength="2000" placeholder="Read all questions carefully…">' + esc(ex.instructions) + '</textarea>' +
+    '<div class="sec">Questions (' + ex.questions.length + ')</div>' +
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">' +
+      '<button class="sbtn sbtn-gold" data-act="q-add">+ Add Question</button>' +
+      '<button class="sbtn" data-act="q-bulk">📋 Bulk Paste</button>' +
+      '<button class="sbtn" data-act="q-file">📂 Import File</button>' +
+      '<button class="sbtn" data-act="q-bank">🏦 From Bank</button>' +
+      (ex.questions.length ? '<button class="sbtn" data-act="q-save-bank">💾 Save All to Bank</button>' : '') +
+    '</div>' +
+    (ex.questions.length
+      ? '<div id="ed-qlist">' + ex.questions.map((q, i) => renderQRow(q, i)).join('') + '</div>'
+      : emptyState('❓', 'No questions yet.', 'Add questions manually, paste a list, or import a DOCX / PDF / TXT file.'));
+
+  const bindVal = (id, key, tr) => {
+    const el = $('#' + id);
+    if (!el) return;
+    el.addEventListener('input', () => {
+      let v = el.value;
+      if (tr) v = tr(v);
+      ex[key] = v;
+    });
+  };
+  bindVal('ex-title', 'title');
+  bindVal('ex-subject', 'subject');
+  bindVal('ex-klass', 'klass');
+  bindVal('ex-dur', 'durationMinutes', v => Math.max(1, parseInt(v) || 1));
+  bindVal('ex-pass', 'passScore', v => Math.min(100, Math.max(1, parseInt(v) || 50)));
+  bindVal('ex-instr', 'instructions');
+  const bindChk = (id, key) => {
+    const el = $('#' + id);
+    if (el) el.addEventListener('change', () => { ex[key] = el.checked; });
+  };
+  bindChk('ex-sq', 'shuffleQuestions');
+  bindChk('ex-so', 'shuffleOptions');
+  bindChk('ex-show', 'showResultImmediately');
+  const ws = $('#ex-wstart'), we = $('#ex-wend');
+  if (ws) ws.addEventListener('change', () => { ex.windowStart = ws.value ? new Date(ws.value).getTime() : null; });
+  if (we) we.addEventListener('change', () => { ex.windowEnd = we.value ? new Date(we.value).getTime() : null; });
+}
+function renderQRow(q, i) {
+  const hasAns = !!q.answerId;
+  return '<div class="item">' +
+    '<h3>Q' + (i + 1) + '. ' + esc(q.text.length > 90 ? q.text.slice(0, 90) + '…' : q.text) + '</h3>' +
+    '<div class="meta">' + q.options.length + ' options · ' +
+      (hasAns ? '<span style="color:var(--ok)">✓ Answer set</span>' : '<span style="color:var(--accent)">⚠ No answer</span>') +
+    '</div>' +
+    '<div class="acts">' +
+      '<button class="sbtn" data-act="q-edit" data-idx="' + i + '">Edit</button>' +
+      (i > 0 ? '<button class="sbtn" data-act="q-up" data-idx="' + i + '">↑</button>' : '') +
+      (i < editingExam.questions.length - 1 ? '<button class="sbtn" data-act="q-down" data-idx="' + i + '">↓</button>' : '') +
+      '<button class="sbtn sbtn-red" data-act="q-del" data-idx="' + i + '">Delete</button>' +
+    '</div></div>';
+}
+function questionEditor(idx) {
+  const isNew = idx === -1;
+  const q = isNew
+    ? { id: uid(), text: '', options: [
+        { id: uid(), label: 'A', text: '' }, { id: uid(), label: 'B', text: '' },
+        { id: uid(), label: 'C', text: '' }, { id: uid(), label: 'D', text: '' }
+      ], answerId: null }
+    : JSON.parse(JSON.stringify(editingExam.questions[idx]));
+  const bg = openModal(
+    '<h2>' + (isNew ? 'Add Question' : 'Edit Question') + '</h2>' +
+    '<label for="qq-text">Question Text *</label>' +
+    '<textarea id="qq-text" rows="3" maxlength="1000">' + esc(q.text) + '</textarea>' +
+    '<label>Answer Options * <span style="font-weight:400;text-transform:none">(tap the circle to mark the correct answer)</span></label>' +
+    '<div id="qq-opts"></div>' +
+    '<button class="sbtn" id="qq-addopt" style="margin-bottom:14px">+ Add Option</button>' +
+    '<p class="err" id="qq-err"></p>' +
+    '<div class="mfoot">' +
+      '<button class="sbtn" data-cancel>Cancel</button>' +
+      '<button class="sbtn sbtn-gold" id="qq-save">Save Question</button>' +
+    '</div>'
+  );
+  function renderOpts() {
+    const box = bg.querySelector('#qq-opts');
+    box.innerHTML = q.options.map((o) =>
+      '<div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">' +
+        '<button type="button" data-correct="' + o.id + '" style="width:38px;height:38px;' +
+          'border-radius:50%;flex-shrink:0;border:2px solid ' +
+          (q.answerId === o.id ? 'var(--ok)' : 'var(--line)') + ';background:' +
+          (q.answerId === o.id ? 'var(--ok)' : 'transparent') + ';color:#fff;' +
+          'font-weight:800;cursor:pointer;font-size:1rem">' + o.label + '</button>' +
+        '<input type="text" data-opt="' + o.id + '" maxlength="300" value="' + esc(o.text) +
+          '" placeholder="Option ' + o.label + '" style="margin:0">' +
+        (q.options.length > 2
+          ? '<button type="button" data-delopt="' + o.id + '" class="sbtn sbtn-red" ' +
+            'style="flex-shrink:0">×</button>' : '') +
+      '</div>'
+    ).join('');
+    box.querySelectorAll('[data-correct]').forEach(b => {
+      b.addEventListener('click', () => { q.answerId = b.dataset.correct; renderOpts(); });
+    });
+    box.querySelectorAll('[data-opt]').forEach(inp => {
+      inp.addEventListener('input', () => {
+        const o = q.options.find(x => x.id === inp.dataset.opt);
+        if (o) o.text = inp.value;
+      });
+    });
+    box.querySelectorAll('[data-delopt]').forEach(b => {
+      b.addEventListener('click', () => {
+        q.options = q.options.filter(x => x.id !== b.dataset.delopt);
+        q.options.forEach((o, i) => o.label = LETTERS[i]);
+        if (!q.options.some(o => o.id === q.answerId)) q.answerId = null;
+        renderOpts();
+      });
+    });
+  }
+  renderOpts();
+  bg.querySelector('#qq-addopt').addEventListener('click', () => {
+    if (q.options.length >= 6) { toast('Maximum 6 options.', 'err'); return; }
+    q.options.push({ id: uid(), label: LETTERS[q.options.length], text: '' });
+    renderOpts();
+  });
+  bg.querySelector('[data-cancel]').addEventListener('click', () => closeModal(bg));
+  bg.querySelector('#qq-save').addEventListener('click', () => {
+    const err = bg.querySelector('#qq-err');
+    q.text = bg.querySelector('#qq-text').value.trim();
+    if (!q.text) { err.textContent = 'Question text is required.'; err.classList.add('show'); return; }
+    const filled = q.options.filter(o => o.text.trim());
+    if (filled.length < 2) { err.textContent = 'At least 2 options with text are required.'; err.classList.add('show'); return; }
+    if (!q.answerId || !filled.some(o => o.id === q.answerId)) { err.textContent = 'Mark the correct answer by tapping a circle.'; err.classList.add('show'); return; }
+    q.options = filled;
+    q.options.forEach((o, i) => o.label = LETTERS[i]);
+    q.options.forEach(o => o.text = o.text.trim());
+    if (isNew) editingExam.questions.push(q);
+    else editingExam.questions[idx] = q;
+    closeModal(bg);
+    renderExamEditor();
+    toast(isNew ? 'Question added.' : 'Question updated.', 'ok');
+  });
+}
+function parseQuestionText(raw) {
+  const lines = raw.split(/\r?\n/);
+  const questions = [];
+  const skipped = [];
+  let cur = null;
+  const flush = () => {
+    if (!cur) return;
+    if (cur.options.length >= 2 && cur.text.trim()) questions.push(cur);
+    else skipped.push(cur.text.trim() || '(blank)');
+    cur = null;
+  };
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (!line) continue;
+    const qm = line.match(/^(?:Q\s*)?(\d{1,3})\s*[.)\-:]\s*(.+)$/i);
+    if (qm) { flush(); cur = { id: uid(), text: qm[2].trim(), options: [], answerId: null }; continue; }
+    if (cur) {
+      const om = line.match(/^[\[(]?\s*([A-Fa-f])\s*[\].)\-:]\s*(.+)$/);
+      if (om) { cur.options.push({ id: uid(), label: om[1].toUpperCase(), text: om[2].trim() }); continue; }
+      if (!cur.options.length) { cur.text += ' ' + line; continue; }
+      skipped.push(line);
+    } else skipped.push(line);
+  }
+  flush();
+  questions.forEach(q => q.options.forEach((o, i) => o.label = LETTERS[i]));
+  return { questions, skipped };
+}
+function bulkPasteDialog() {
+  const bg = openModal(
+    '<h2>Bulk Paste Questions</h2>' +
+    '<p class="modal-sub">Paste numbered questions with lettered options.<br>Example:<br><code>1. What is 2+2?<br>A) 3<br>B) 4<br>C) 5<br>D) 6</code></p>' +
+    '<textarea id="bp-text" rows="10" maxlength="40000" placeholder="1. Question text&#10;A) Option one&#10;B) Option two&#10;C) Option three&#10;D) Option four"></textarea>' +
+    '<div id="bp-preview"></div>' +
+    '<div class="mfoot">' +
+      '<button class="sbtn" data-cancel>Cancel</button>' +
+      '<button class="sbtn sbtn-gold" id="bp-go">Add Questions</button>' +
+    '</div>'
+  );
+  const ta = bg.querySelector('#bp-text');
+  const prev = bg.querySelector('#bp-preview');
+  const update = () => {
+    const r = parseQuestionText(ta.value);
+    prev.innerHTML =
+      '<div class="hint" style="margin-bottom:12px">' +
+        '<strong style="color:var(--ok)">' + r.questions.length + ' parsed</strong>' +
+        (r.skipped.length ? ' · <strong style="color:var(--accent)">' + r.skipped.length + ' line(s) skipped</strong>' : '') +
+      '</div>' +
+      (r.questions.length
+        ? r.questions.slice(0, 3).map((q, i) =>
+            '<div class="item" style="padding:11px"><strong style="font-size:.82rem">Q' + (i + 1) + ': ' + esc(q.text) + '</strong>' +
+            '<div class="meta">' + q.options.map(o => o.label + ') ' + esc(o.text)).join(' · ') + '</div></div>').join('') +
+          (r.questions.length > 3 ? '<p class="hint">…and ' + (r.questions.length - 3) + ' more.</p>' : '')
+        : '');
+  };
+  ta.addEventListener('input', update);
+  bg.querySelector('[data-cancel]').addEventListener('click', () => closeModal(bg));
+  bg.querySelector('#bp-go').addEventListener('click', () => {
+    const r = parseQuestionText(ta.value);
+    if (!r.questions.length) { toast('No questions could be parsed.', 'err'); return; }
+    r.questions.forEach(q => editingExam.questions.push(q));
+    closeModal(bg);
+    renderExamEditor();
+    toast('Added ' + r.questions.length + ' question(s). Set the answers next.', 'ok');
+  });
+}
+function fileImportDialog() {
+  const bg = openModal(
+    '<h2>Import Questions from File</h2>' +
+    '<p class="modal-sub">Supports .txt, .docx and .pdf. Questions must be numbered with lettered options.</p>' +
+    '<input type="file" id="fi-file" accept=".txt,.docx,.pdf,text/plain,application/pdf">' +
+    '<div id="fi-status" class="hint"></div>' +
+    '<div class="mfoot"><button class="sbtn" data-cancel>Close</button></div>'
+  );
+  const status = bg.querySelector('#fi-status');
+  bg.querySelector('[data-cancel]').addEventListener('click', () => closeModal(bg));
+  bg.querySelector('#fi-file').addEventListener('change', async e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    status.textContent = '⏳ Reading file…';
+    status.style.color = 'var(--accent)';
+    try {
+      const ext = f.name.split('.').pop().toLowerCase();
+      let text = '';
+      if (ext === 'txt') text = await f.text();
+      else if (ext === 'docx') text = await readDocx(f);
+      else if (ext === 'pdf') text = await readPdf(f);
+      else throw new Error('Unsupported file type.');
+      const r = parseQuestionText(text);
+      if (!r.questions.length) {
+        status.innerHTML = '<span style="color:var(--err)">⚠ No questions found.</span><br>Make sure questions are numbered (1. 2. 3.) and options are lettered (A) B) C) D). You can also paste the questions manually using "Bulk Paste".';
+        return;
+      }
+      r.questions.forEach(q => editingExam.questions.push(q));
+      status.innerHTML = '<span style="color:var(--ok)">✓ Added ' + r.questions.length + ' question(s).</span>' +
+        (r.skipped.length ? ' <span style="color:var(--accent)">(' + r.skipped.length + ' line(s) skipped)</span>' : '') +
+        '<br>Review them in the questions list and set the answer key.';
+      renderExamEditor();
+    } catch (err) {
+      status.innerHTML = '<span style="color:var(--err)">⚠ ' + esc(err.message || 'Could not read that file.') + '</span><br>Try saving as .txt, or paste the questions manually.';
+    }
+  });
+}
+async function readDocx(file) {
+  const buf = await file.arrayBuffer();
+  const bytes = new Uint8Array(buf);
+  const sig = [0x50, 0x4B, 0x03, 0x04];
+  let i = 0;
+  while (i < bytes.length - 30) {
+    if (bytes[i] !== sig[0] || bytes[i+1] !== sig[1] || bytes[i+2] !== sig[2] || bytes[i+3] !== sig[3]) { i++; continue; }
+    const method = bytes[i+8] | (bytes[i+9] << 8);
+    const compSize = (bytes[i+18] | (bytes[i+19] << 8) | (bytes[i+20] << 16) | (bytes[i+21] << 24)) >>> 0;
+    const nameLen = bytes[i+26] | (bytes[i+27] << 8);
+    const extraLen = bytes[i+28] | (bytes[i+29] << 8);
+    let name = '';
+    for (let j = 0; j < nameLen; j++) name += String.fromCharCode(bytes[i+30+j]);
+    const dataStart = i + 30 + nameLen + extraLen;
+    if (name === 'word/document.xml') {
+      if (compSize === 0 || dataStart + compSize > bytes.length) throw new Error('The DOCX file appears to be malformed.');
+      const comp = bytes.slice(dataStart, dataStart + compSize);
+      let xml;
+      if (method === 0) xml = new TextDecoder('utf-8').decode(comp);
+      else if (method === 8) {
+        if (typeof DecompressionStream === 'undefined') throw new Error('This browser cannot decompress DOCX files. Please save as .txt.');
+        const ds = new DecompressionStream('deflate-raw');
+        const w = ds.writable.getWriter();
+        w.write(comp); w.close();
+        const chunks = [];
+        const rd = ds.readable.getReader();
+        for (;;) { const { value, done } = await rd.read(); if (done) break; chunks.push(value); }
+        const total = chunks.reduce((a, c) => a + c.length, 0);
+        const merged = new Uint8Array(total);
+        let off = 0;
+        for (const c of chunks) { merged.set(c, off); off += c.length; }
+        xml = new TextDecoder('utf-8').decode(merged);
+      } else throw new Error('Unsupported compression in DOCX file.');
+      return xml
+        .replace(/<w:br[^>]*\/?>/gi, '\n')
+        .replace(/<\/w:p>/gi, '\n')
+        .replace(/<[^>]+>/g, '')
+        .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"').replace(/&apos;/g, "'")
+        .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)));
+    }
+    if (compSize === 0) { i++; continue; }
+    i = dataStart + compSize;
+  }
+  throw new Error('Could not find readable text in this DOCX file.');
+}
+async function readPdf(file) {
+  const buf = await file.arrayBuffer();
+  const bytes = new Uint8Array(buf);
+  let raw = '';
+  const CHUNK = 8192;
+  for (let i = 0; i < bytes.length; i += CHUNK) raw += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK));
+  const un = s => s.replace(/\\n/g,'\n').replace(/\\r/g,'\n').replace(/\\t/g,' ')
+    .replace(/\\\(/g,'(').replace(/\\\)/g,')').replace(/\\\\/g,'\\')
+    .replace(/\\([0-7]{1,3})/g, (_, o) => String.fromCharCode(parseInt(o, 8)));
+  let text = '';
+  const bt = raw.match(/BT[\s\S]*?ET/g) || [];
+  bt.forEach(b => {
+    const strs = b.match(/\(([^)\\]|\\.)*\)/g) || [];
+    strs.forEach(s => { text += un(s.slice(1, -1)) + ' '; });
+    text += '\n';
+  });
+  if (text.trim().length < 20) {
+    const re = /stream\r?\n([\s\S]*?)endstream/g;
+    let m;
+    while ((m = re.exec(raw)) !== null) {
+      const strs = m[1].match(/\(([^)\\]|\\.)*\)/g) || [];
+      strs.forEach(s => { text += un(s.slice(1, -1)) + ' '; });
+    }
+  }
+  if (text.trim().length < 10) throw new Error('No readable text found in this PDF (it may be a scanned image). Please paste the questions manually.');
+  return text;
+}
+function openBank() {
+  const mine = DB.bank.filter(b => b.teacherId === CURRENT_USER.id);
+  const bg = openModal(
+    '<h2>Question Bank</h2>' +
+    '<p class="modal-sub">Pick questions to add to this exam.</p>' +
+    (mine.length
+      ? '<div style="max-height:46vh;overflow-y:auto">' +
+          mine.map(b =>
+            '<label class="chk" style="align-items:flex-start">' +
+              '<input type="checkbox" data-bank="' + b.id + '">' +
+              '<span><strong style="font-size:.82rem">' + esc(b.text) + '</strong>' +
+              '<div class="meta">' + b.options.map(o => o.label + ') ' + esc(o.text)).join(' · ') + '</div></span>' +
+            '</label>').join('') +
+        '</div>'
+      : emptyState('🏦', 'Your bank is empty.', 'Save questions to your bank from any exam to reuse them later.')) +
+    '<div class="mfoot">' +
+      '<button class="sbtn" data-cancel>Cancel</button>' +
+      (mine.length ? '<button class="sbtn sbtn-gold" id="bk-go">Add Selected</button>' : '') +
+    '</div>'
+  );
+  bg.querySelector('[data-cancel]').addEventListener('click', () => closeModal(bg));
+  const go = bg.querySelector('#bk-go');
+  if (go) go.addEventListener('click', () => {
+    const ids = Array.from(bg.querySelectorAll('[data-bank]:checked')).map(c => c.dataset.bank);
+    if (!ids.length) { toast('Select at least one question.', 'err'); return; }
+    ids.forEach(id => {
+      const src = DB.bank.find(b => b.id === id);
+      if (!src) return;
+      editingExam.questions.push({
+        id: uid(), text: src.text,
+        options: src.options.map(o => ({ id: uid(), label: o.label, text: o.text })),
+        answerId: null
+      });
+    });
+    closeModal(bg);
+    renderExamEditor();
+    toast('Added ' + ids.length + ' question(s). Confirm the answers.', 'ok');
+  });
+}
+async function saveAllToBank() {
+  if (!editingExam.questions.length) { toast('No questions to save.', 'err'); return; }
+  const batch = [];
+  editingExam.questions.forEach(q => {
+    if (DB.bank.some(b => b.teacherId === CURRENT_USER.id && b.text === q.text)) return;
+    batch.push({
+      id: uid(), teacherId: CURRENT_USER.id, text: q.text,
+      options: q.options.map(o => ({ id: uid(), label: o.label, text: o.text }))
+    });
+  });
+  if (!batch.length) { toast('All questions already in bank.', ''); return; }
+  await Store.saveBankItems(batch);
+  toast('Saved ' + batch.length + ' question(s) to your bank.', 'ok');
+}
+async function saveExam() {
+  const ex = editingExam;
+  ex.title = ($('#ex-title').value || '').trim();
+  ex.subject = ($('#ex-subject').value || '').trim();
+  ex.klass = ($('#ex-klass').value || '').trim();
+  ex.instructions = ($('#ex-instr').value || '').trim();
+  ex.durationMinutes = Math.max(1, parseInt($('#ex-dur').value) || 1);
+  ex.passScore = Math.min(100, Math.max(1, parseInt($('#ex-pass').value) || 50));
+  const ws = $('#ex-wstart'), we = $('#ex-wend');
+  ex.windowStart = ws && ws.value ? new Date(ws.value).getTime() : null;
+  ex.windowEnd = we && we.value ? new Date(we.value).getTime() : null;
+  if (!ex.title) { toast('Exam title is required.', 'err'); return; }
+  if (!ex.questions.length) { toast('Add at least one question.', 'err'); return; }
+  if (ex.durationMinutes < 1) { toast('Duration must be at least 1 minute.', 'err'); return; }
+  if (ex.passScore < 1 || ex.passScore > 100) { toast('Pass mark must be 1–100.', 'err'); return; }
+  for (let i = 0; i < ex.questions.length; i++) {
+    const q = ex.questions[i];
+    if (!q.text || !q.text.trim()) { toast('Question ' + (i + 1) + ' has no text.', 'err'); return; }
+    const opts = (q.options || []).filter(o => o.text && o.text.trim());
+    if (opts.length < 2) { toast('Question ' + (i + 1) + ' needs at least 2 options.', 'err'); return; }
+    if (!q.answerId || !opts.some(o => o.id === q.answerId)) { toast('Question ' + (i + 1) + ' has no correct answer set.', 'err'); return; }
+  }
+  if (ex.windowStart && ex.windowEnd && ex.windowStart > ex.windowEnd) { toast('Exam window start must be before the end.', 'err'); return; }
+  try { await Store.saveExam(ex); }
+  catch (err) { toast('Save failed: ' + (err.message || 'unknown error'), 'err'); return; }
+  toast('Exam saved.', 'ok');
+  editingExam = null;
+  showScreen('scr-dash');
+  dashTab = 'exams';
+  renderDash();
+}
+function openAnswerKey(examId) {
+  const ex = DB.exams.find(e => e.id === examId);
+  if (!ex) return;
+  const temp = JSON.parse(JSON.stringify(ex.questions));
+  const total = temp.length;
+  const has50Plus = total >= 50;
+
+  /* ── Build the modal HTML ─────────────────────────────────── */
+  function buildModalHtml() {
+    const setCount = temp.filter(q => q.answerId).length;
+    const pct = total ? Math.round((setCount / total) * 100) : 0;
+
+    const jumpSel = has50Plus
+      ? '<div style="display:flex;align-items:center;gap:9px;margin-bottom:14px;flex-wrap:wrap">' +
+          '<label style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:0;white-space:nowrap">Jump to Q:</label>' +
+          '<select id="ak-jump" style="flex:1;max-width:180px;margin:0;font-size:.9rem">' +
+            temp.map((q, i) => '<option value="' + i + '">' + (i + 1) + '. ' + esc(q.text.length > 40 ? q.text.slice(0, 40) + '…' : q.text) + '</option>').join('') +
+          '</select>' +
+        '</div>'
+      : '';
+
+    const cards = temp.map((q, i) => {
+      const shortText = q.text.length > 120 ? q.text.slice(0, 120) + '…' : q.text;
+      return '<div class="ak-card" id="ak-card-' + i + '" style="background:var(--panel2);border:1.5px solid var(--line);border-radius:11px;padding:14px 14px 12px;margin-bottom:10px;scroll-margin-top:16px">' +
+        '<div style="font-size:.8rem;font-weight:800;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px">Q' + (i + 1) + '</div>' +
+        '<div style="font-size:.87rem;line-height:1.55;margin-bottom:12px;white-space:pre-wrap;word-break:break-word;color:#e8eaf2">' + esc(shortText) + '</div>' +
+        '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px">' +
+          q.options.slice(0, 4).map((o, j) => {
+            const isSelected = q.answerId === o.id;
+            return '<button class="ak-opt-btn" data-ak-q="' + q.id + '" data-ak-o="' + o.id + '" style="' +
+              'min-height:52px;border-radius:9px;border:2px solid ' + (isSelected ? 'var(--accent)' : 'var(--line)') + ';' +
+              'background:' + (isSelected ? 'linear-gradient(135deg,var(--accent),var(--accent2))' : 'var(--panel)') + ';' +
+              'color:' + (isSelected ? '#0a0c14' : '#fff') + ';' +
+              'font-size:1.1rem;font-weight:800;cursor:pointer;transition:all .12s;' +
+              'display:flex;align-items:center;justify-content:center">' +
+              esc(o.label || LETTERS[j]) +
+            '</button>';
+          }).join('') +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    return '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:4px">' +
+        '<h2 style="font-size:1rem;margin:0">Answer Key</h2>' +
+        '<span style="font-size:.78rem;font-weight:800;color:' + (setCount === total ? 'var(--ok)' : 'var(--accent)') + '">' + setCount + ' of ' + total + ' Set</span>' +
+      '</div>' +
+      '<div style="height:6px;background:var(--line);border-radius:3px;margin-bottom:14px;overflow:hidden">' +
+        '<div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .3s"></div>' +
+      '</div>' +
+      '<p class="modal-sub" style="margin-bottom:10px">' + esc(ex.title) + ' · ' + total + ' question' + (total !== 1 ? 's' : '') + '</p>' +
+      jumpSel +
+      '<div id="ak-cards-wrap" style="max-height:54vh;overflow-y:auto;padding-right:2px">' + cards + '</div>' +
+      '<div style="padding-top:12px;border-top:1px solid var(--line);margin-top:4px;display:flex;gap:9px">' +
+        '<button class="sbtn" id="ak-cancel" style="flex:1;min-height:var(--tap)">Cancel</button>' +
+        '<button class="sbtn sbtn-gold" id="ak-save" style="flex:2;min-height:var(--tap);font-size:.95rem">💾 Save All Answers</button>' +
+      '</div>';
+  }
+
+  const bg = openModal(buildModalHtml());
+
+  /* ── Wire up option button clicks ────────────────────────── */
+  function wireButtons() {
+    bg.querySelectorAll('.ak-opt-btn').forEach(b => {
+      b.addEventListener('click', () => {
+        const q = temp.find(x => x.id === b.dataset.akQ);
+        if (!q) return;
+        q.answerId = b.dataset.akO;
+        // Re-render just this card's buttons
+        const card = b.closest('.ak-card');
+        card.querySelectorAll('.ak-opt-btn').forEach(btn => {
+          const selected = btn.dataset.akO === q.answerId;
+          btn.style.border = '2px solid ' + (selected ? 'var(--accent)' : 'var(--line)');
+          btn.style.background = selected ? 'linear-gradient(135deg,var(--accent),var(--accent2))' : 'var(--panel)';
+          btn.style.color = selected ? '#0a0c14' : '#fff';
+        });
+        // Update progress bar & counter
+        const setCount = temp.filter(x => x.answerId).length;
+        const pct = total ? Math.round((setCount / total) * 100) : 0;
+        const bar = bg.querySelector('#ak-cards-wrap').previousElementSibling.previousElementSibling.previousElementSibling;
+        if (bar) {
+          const fill = bar.querySelector('div');
+          if (fill) fill.style.width = pct + '%';
+        }
+        const ctr = bg.querySelector('span[style*="Set"]');
+        if (ctr) {
+          ctr.textContent = setCount + ' of ' + total + ' Set';
+          ctr.style.color = setCount === total ? 'var(--ok)' : 'var(--accent)';
+        }
+      });
+    });
+
+    // Jump-to-question dropdown
+    const jump = bg.querySelector('#ak-jump');
+    if (jump) {
+      jump.addEventListener('change', () => {
+        const card = bg.querySelector('#ak-card-' + jump.value);
+        if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+  }
+  wireButtons();
+
+  bg.querySelector('#ak-cancel').addEventListener('click', () => closeModal(bg));
+  bg.querySelector('#ak-save').addEventListener('click', async () => {
+    const missing = temp.reduce((acc, q, i) => { if (!q.answerId) acc.push(i + 1); return acc; }, []);
+    if (missing.length) {
+      toast('⚠️ You have not set answers for questions ' + missing.slice(0, 10).join(', ') + (missing.length > 10 ? '…' : '.'), 'warn');
+      // Scroll to first missing
+      const card = bg.querySelector('#ak-card-' + (missing[0] - 1));
+      if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    const upd = JSON.parse(JSON.stringify(ex));
+    upd.questions = temp;
+    await Store.saveExam(upd);
+    closeModal(bg);
+    renderExams();
+    toast('✅ ' + total + '/' + total + ' Answers saved.', 'ok');
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   STUDENT FLOW — strict registry verification (Phase 3)
+   Students must be pre-registered; code + name + class must match.
+   ═══════════════════════════════════════════════════════════════ */
+function openStudentPicker() {
+  renderStudentPicker();
+  showScreen('scr-pick');
+}
+function renderStudentPicker() {
+  const now = Date.now();
+  const open = DB.exams.filter(e => {
+    if (examStatus(e) !== 'published') return false;
+    if (e.windowStart && now < e.windowStart) return false;
+    if (e.windowEnd && now > e.windowEnd) return false;
+    return e.questions.length > 0;
+  });
+  $('#pick-list').innerHTML = open.length
+    ? open.map(ex =>
+        '<button class="item" style="display:block;width:100%;text-align:left;cursor:pointer;background:var(--panel);border:1.5px solid var(--line)" ' +
+          'data-act="pick-exam" data-id="' + ex.id + '">' +
+          '<h3 style="color:#fff">' + esc(ex.title) + '</h3>' +
+          '<div class="meta">' +
+            '📚 ' + esc(ex.subject || 'General') + ' · 🎓 ' + esc(ex.klass || 'All classes') + ' · 👤 ' + esc(ex.teacherName || '—') + '<br>' +
+            '📝 ' + ex.questions.length + ' questions · ⏱ ' + ex.durationMinutes + ' min · 🎯 Pass ' + ex.passScore + '%' +
+          '</div></button>').join('')
+    : emptyState('📭', 'No exams are currently available.', 'Please check back later or contact your exam officer.');
+}
+function openBriefing(examId) {
+  const ex = DB.exams.find(e => e.id === examId);
+  if (!ex) return;
+  $('#brief-body').innerHTML =
+    '<div class="card" style="max-width:100%;margin:0 auto">' +
+      '<div class="crest sm" id="brief-crest">🏫</div>' +
+      '<h2 style="text-align:center;font-size:1.15rem;margin-bottom:6px">' + esc(ex.title) + '</h2>' +
+      '<p style="text-align:center;color:var(--muted);font-size:.82rem;margin-bottom:20px">' + esc(ex.subject || 'General') + ' · ' + esc(ex.klass || 'All classes') + '</p>' +
+      '<div class="rgrid" style="grid-template-columns:repeat(2,1fr)">' +
+        '<div class="rcell"><div class="v">' + ex.questions.length + '</div><div class="l">Questions</div></div>' +
+        '<div class="rcell"><div class="v">' + ex.durationMinutes + '</div><div class="l">Minutes</div></div>' +
+        '<div class="rcell"><div class="v">' + ex.passScore + '%</div><div class="l">Pass Mark</div></div>' +
+        '<div class="rcell"><div class="v" style="font-size:.8rem">' + esc(ex.teacherName || '—') + '</div><div class="l">Teacher</div></div>' +
+      '</div>' +
+      (ex.instructions
+        ? '<div class="sec" style="margin-top:6px">Instructions</div>' +
+          '<div style="background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:14px;font-size:.84rem;line-height:1.7;white-space:pre-wrap;word-break:break-word">' + esc(ex.instructions) + '</div>'
+        : '') +
+      '<div class="sec">Your Details</div>' +
+      '<div class="note">🔒 Enter your registered Name, Student Code and Class exactly as provided by your exam officer.</div>' +
+      '<label for="br-name">Full Name</label>' +
+      '<input id="br-name" type="text" maxlength="60" placeholder="e.g. Aminu Ibrahim" autocomplete="name">' +
+      '<label for="br-code">Student Code / Matric Number</label>' +
+      '<input id="br-code" type="text" maxlength="32" autocapitalize="characters" placeholder="e.g. AIS/2024/001" autocomplete="off">' +
+      '<label for="br-klass">Class / Level</label>' +
+      '<input id="br-klass" type="text" maxlength="20" placeholder="e.g. SS2A" autocomplete="off">' +
+      '<p class="err" id="br-err" style="font-size:.84rem;padding:10px 12px;background:rgba(224,82,82,.1);border:1px solid rgba(224,82,82,.4);border-radius:8px;line-height:1.55"></p>' +
+      '<label class="chk" style="margin-top:6px"><input type="checkbox" id="br-ack"><span>I have read and understood the instructions above.</span></label>' +
+      '<button class="btn btn-gold" id="br-start" disabled style="margin-top:8px">Start Exam →</button>' +
+    '</div>';
+  crestHTML('brief-crest');
+  const ack = $('#br-ack');
+  const start = $('#br-start');
+  ack.addEventListener('change', () => { start.disabled = !ack.checked; });
+  start.addEventListener('click', async () => {
+    const name = clean($('#br-name').value);
+    const code = clean($('#br-code').value).toUpperCase();
+    const klass = clean($('#br-klass').value);
+    const err = $('#br-err');
+    err.classList.remove('show');
+
+    // Basic field validation
+    if (!name) { err.textContent = 'Please enter your full name.'; err.classList.add('show'); return; }
+    if (name.length < 2) { err.textContent = 'Please enter at least 2 characters for your name.'; err.classList.add('show'); return; }
+    if (!code) { err.textContent = 'Please enter your student code / matric number.'; err.classList.add('show'); return; }
+    if (!klass) { err.textContent = 'Please enter your Class / Level.'; err.classList.add('show'); return; }
+
+    // ── STRICT REGISTRY VERIFICATION ─────────────────────────────
+    start.disabled = true;
+    start.textContent = 'Verifying…';
+    const student = await Store.getStudent(code);
+    start.textContent = 'Start Exam →';
+    start.disabled = false;
+
+    if (!student) {
+      err.textContent = '❌ Student not found. Please check your Name, Code, and Class, or contact your exam officer.';
+      err.classList.add('show');
+      return;
+    }
+
+    // Name match — case-insensitive, trimmed
+    const normName = name.trim().toLowerCase().replace(/\s+/g, ' ');
+    const regName  = (student.name || '').trim().toLowerCase().replace(/\s+/g, ' ');
+    if (normName !== regName) {
+      err.textContent = '❌ Student not found. Please check your Name, Code, and Class, or contact your exam officer.';
+      err.classList.add('show');
+      return;
+    }
+
+    // Class match — case-insensitive, trimmed
+    const normKlass = klass.trim().toLowerCase().replace(/\s+/g, '');
+    const regKlass  = (student.klass || '').trim().toLowerCase().replace(/\s+/g, '');
+    if (regKlass && normKlass !== regKlass) {
+      err.textContent = '❌ Student not found. Please check your Name, Code, and Class, or contact your exam officer.';
+      err.classList.add('show');
+      return;
+    }
+    // ── END REGISTRY VERIFICATION ─────────────────────────────────
+
+    startExam(ex, student);
+  });
+  showScreen('scr-brief');
+}
+
+/* ---------- Exam session ---------- */
+let S = null;
+let timerHandle = null;
+let cheatAttached = false;
+let lastFocusIncident = 0;
+let sessionSubmitted = false;
+let initialWidth = 0;
+
+function startExam(exam, student) {
+  let qOrder = exam.questions.map(q => q.id);
+  if (exam.shuffleQuestions) qOrder = shuffle(qOrder);
+  const optOrders = {};
+  exam.questions.forEach(q => {
+    let ids = (q.options || []).map(o => o.id);
+    if (exam.shuffleOptions) ids = shuffle(ids);
+    optOrders[q.id] = ids;
+  });
+  S = {
+    examId: exam.id,
+    studentName: student.name,
+    studentCode: student.code,
+    studentClass: student.klass || '',
+    startedAt: Date.now(),
+    durationMs: exam.durationMinutes * 60 * 1000,
+    qOrder, optOrders,
+    answers: {}, flags: {},
+    currentIndex: 0, incidents: [], submitted: false
+  };
+  Store.saveSession(S);
+  showScreen('scr-exam');
+  renderExamShell();
+  renderQuestion();
+  startTimer();
+  if (DB.settings.strictAntiCheat) { attachAntiCheat(); requestFullscreenSafe(); }
+  initialWidth = window.innerWidth;
+}
+function examById(id) { return DB.exams.find(e => e.id === id); }
+function renderExamShell() {
+  const ex = examById(S.examId);
+  if (!ex) return;
+  $('#exam-title').textContent = ex.title;
+  $('#exam-student').textContent = S.studentName + ' — ' + S.studentCode + (S.studentClass ? ' · ' + S.studentClass : '');
+  crestHTML('exam-crest');
+}
+function renderQuestion() {
+  const ex = examById(S.examId);
+  if (!ex || !S) return;
+  const qid = S.qOrder[S.currentIndex];
+  const q = ex.questions.find(x => x.id === qid);
+  if (!q) return;
+  const total = S.qOrder.length;
+  const answered = Object.keys(S.answers).length;
+  const isLast = S.currentIndex === total - 1;
+
+  const rawOptions = Array.isArray(q.options) ? q.options : [];
+  const options = rawOptions.filter(o => o && typeof o.text === 'string');
+
+  let optsHtml;
+  if (!options.length) {
+    console.warn('[CBT] Question has no options:', q);
+    optsHtml =
+      '<div style="padding:16px;background:rgba(224,82,82,.12);' +
+      'border:1.5px solid var(--err);border-radius:9px;color:var(--err);' +
+      'font-weight:700;text-align:center;margin-top:14px">' +
+      '⚠ Error: No options found for this question.<br>' +
+      '<span style="font-weight:400;font-size:.78rem">Ask your teacher to re-save this question.</span>' +
+      '</div>';
+  } else {
+    let optIds = S.optOrders && Array.isArray(S.optOrders[qid]) && S.optOrders[qid].length
+      ? S.optOrders[qid]
+      : options.map(o => o.id);
+    optsHtml = '<ul class="opts">' + optIds.map((oid, i) => {
+      const o = options.find(x => x.id === oid) || options[i];
+      if (!o) return '';
+      const sel = S.answers[qid] === o.id;
+      const label = LETTERS[i] || o.label || '?';
+      return '<li class="opt' + (sel ? ' sel' : '') +
+        '" data-act="pick-opt" data-oid="' + esc(o.id) + '">' +
+        '<div class="olb">' + esc(label) + '</div>' +
+        '<div class="otext">' + esc(o.text) + '</div>' +
+        '</li>';
+    }).join('') + '</ul>';
+  }
+
+  $('#exam-body').innerHTML =
+    '<div class="qcard">' +
+      '<div class="qnum">Question ' + (S.currentIndex + 1) + ' of ' + total + '</div>' +
+      '<div class="qtext">' + esc(q.text) + '</div>' +
+      optsHtml +
+    '</div>';
+
+  const paletteHtml = S.qOrder.map((id, i) => {
+    const cls = 'qd' +
+      (S.answers[id] !== undefined ? ' ans' : '') +
+      (i === S.currentIndex ? ' cur' : '') +
+      (S.flags[id] ? ' flag' : '');
+    return '<div class="' + cls + '" data-act="jump-q" data-idx="' + i + '">' + (i + 1) + '</div>';
+  }).join('');
+  const pm = $('#palette-mount');
+  if (pm) pm.innerHTML = paletteHtml;
+
+  const fb = $('#flag-btn');
+  if (fb) {
+    if (S.flags[qid]) { fb.classList.add('on'); fb.textContent = '🚩 Flagged for review'; }
+    else { fb.classList.remove('on'); fb.textContent = '⚐ Flag for review'; }
+  }
+
+  $('#nav-mid').textContent = answered + ' of ' + total + ' answered';
+  const pb = $('#nav-prev');
+  pb.disabled = S.currentIndex === 0;
+  pb.style.opacity = S.currentIndex === 0 ? '.4' : '1';
+  const nb = $('#nav-next');
+  if (isLast) {
+    nb.textContent = '✓ Submit Exam';
+    nb.className = 'sbtn sbtn-gold';
+    nb.dataset.act = 'ex-submit';
+  } else {
+    nb.textContent = 'Next →';
+    nb.className = 'sbtn sbtn-gold';
+    nb.dataset.act = 'ex-next';
+  }
+}
+function pickOption(oid) {
+  const qid = S.qOrder[S.currentIndex];
+  S.answers[qid] = oid;
+  Store.saveSession(S);
+  renderQuestion();
+}
+function jumpQuestion(i) {
+  if (i < 0 || i >= S.qOrder.length) return;
+  S.currentIndex = i;
+  Store.saveSession(S);
+  renderQuestion();
+}
+function toggleFlag() {
+  const qid = S.qOrder[S.currentIndex];
+  if (S.flags[qid]) delete S.flags[qid];
+  else S.flags[qid] = true;
+  Store.saveSession(S);
+  renderQuestion();
+}
+function startTimer() { stopTimer(); tickTimer(); timerHandle = setInterval(tickTimer, 1000); }
+function stopTimer() { if (timerHandle) { clearInterval(timerHandle); timerHandle = null; } }
+function tickTimer() {
+  if (!S || S.submitted) return;
+  const elapsed = Date.now() - S.startedAt;
+  let remain = Math.ceil((S.durationMs - elapsed) / 1000);
+  if (remain < 0) remain = 0;
+  const el = $('#exam-timer');
+  el.textContent = fmtClock(remain);
+  el.classList.toggle('warn', remain < 300 && remain >= 60);
+  el.classList.toggle('crit', remain < 60);
+  if (remain <= 0) { stopTimer(); submitExam(true); }
+}
+function confirmSubmit() {
+  const total = S.qOrder.length;
+  const answered = Object.keys(S.answers).length;
+  const flagged = Object.keys(S.flags).length;
+  const unanswered = total - answered;
+  openModal(
+    '<h2>Submit Exam?</h2>' +
+    '<p class="modal-sub">Please review your progress before submitting.</p>' +
+    '<div class="rgrid" style="grid-template-columns:repeat(3,1fr)">' +
+      '<div class="rcell"><div class="v" style="color:var(--ok)">' + answered + '</div><div class="l">Answered</div></div>' +
+      '<div class="rcell"><div class="v" style="color:var(--err)">' + unanswered + '</div><div class="l">Unanswered</div></div>' +
+      '<div class="rcell"><div class="v" style="color:var(--accent)">' + flagged + '</div><div class="l">Flagged</div></div>' +
+    '</div>' +
+    '<div class="mfoot">' +
+      (unanswered > 0 ? '<button class="sbtn" id="sub-review">Review Unanswered</button>' : '') +
+      '<button class="sbtn" data-cancel>Keep Working</button>' +
+      '<button class="sbtn sbtn-gold" id="sub-go">Submit Now</button>' +
+    '</div>',
+    bg => {
+      bg.querySelector('[data-cancel]').addEventListener('click', () => closeModal(bg));
+      bg.querySelector('#sub-go').addEventListener('click', () => { closeModal(bg); submitExam(false); });
+      const rv = bg.querySelector('#sub-review');
+      if (rv) rv.addEventListener('click', () => {
+        closeModal(bg);
+        for (let i = 0; i < S.qOrder.length; i++) {
+          if (S.answers[S.qOrder[i]] === undefined) { jumpQuestion(i); break; }
+        }
+      });
+    }
+  );
+}
+async function submitExam(byTimeout) {
+  if (sessionSubmitted || !S || S.submitted) return;
+  sessionSubmitted = true;
+  S.submitted = true;
+  stopTimer();
+  detachAntiCheat();
+  const ex = examById(S.examId);
+  if (!ex) {
+    S = null;
+    sessionSubmitted = false;
+    await Store.clearSession();
+    showScreen('scr-dash');
+    return;
+  }
+  const total = ex.questions.length;
+  let correct = 0, wrong = 0, unanswered = 0;
+  ex.questions.forEach(q => {
+    const picked = S.answers[q.id];
+    if (picked === undefined) { unanswered++; return; }
+    if (picked === q.answerId) correct++;
+    else wrong++;
+  });
+  const pct = total ? Math.round((correct / total) * 100) : 0;
+  const passed = pct >= ex.passScore;
+  const timeUsed = Math.min(ex.durationMinutes * 60, Math.round((Date.now() - S.startedAt) / 1000));
+  const result = {
+    id: uid(), examId: ex.id, examTitle: ex.title, subject: ex.subject || '',
+    teacherId: ex.teacherId, teacherName: ex.teacherName || '',
+    studentName: S.studentName, studentCode: S.studentCode, studentClass: S.studentClass || '',
+    correct, wrong, unanswered, total, pct, passed, timeUsed,
+    submittedAt: Date.now(),
+    incidents: S.incidents.slice(),
+    terminated: !!S.terminated,
+    timedOut: !!byTimeout && !S.terminated,
+    answers: Object.assign({}, S.answers)
+  };
+  const reviewData = { qOrder: S.qOrder.slice(), optOrders: JSON.parse(JSON.stringify(S.optOrders)) };
+  S = null;
+  sessionSubmitted = false;
+  try {
+    await Store.saveResult(result);
+    await Store.clearSession();
+  } catch (err) {
+    toast('Could not save result: ' + (err.message || 'storage error'), 'err');
+  }
+  renderResult(result, reviewData);
+  showScreen('scr-result');
+}
+
+/* ---------- Result ---------- */
+let lastResult = null;
+function renderResult(result, reviewData) {
+  lastResult = result;
+  const ex = examById(result.examId);
+  const s = DB.settings;
+  const showAnswers = s.showAnswers && s.allowReview;
+  let reviewHtml = '';
+  if (showAnswers && ex && reviewData) {
+    reviewHtml = '<div class="sec">Answer Review</div>' +
+      reviewData.qOrder.map((qid, i) => {
+        const q = ex.questions.find(x => x.id === qid);
+        if (!q) return '';
+        const options = Array.isArray(q.options) ? q.options : [];
+        const pickedId = result.answers[qid];
+        const optIds = (reviewData.optOrders[qid] && reviewData.optOrders[qid].length)
+          ? reviewData.optOrders[qid]
+          : options.map(o => o.id);
+        return '<div class="review-q">' +
+          '<div class="rq-text">Q' + (i + 1) + '. ' + esc(q.text) + '</div>' +
+          optIds.map((oid, j) => {
+            const o = options.find(x => x.id === oid) || options[j];
+            if (!o) return '';
+            const isCorrect = oid === q.answerId;
+            const isPicked = oid === pickedId;
+            let cls = 'review-opt';
+            if (isCorrect) cls += ' correct';
+            else if (isPicked) cls += ' wrong';
+            return '<div class="' + cls + '">' +
+              '<span class="tag">' + (LETTERS[j] || o.label) + '</span>' +
+              '<span>' + esc(o.text) + '</span>' +
+              (isCorrect ? '<span style="margin-left:auto;color:var(--ok);font-size:.7rem">✓ Correct</span>' : '') +
+              (isPicked && !isCorrect ? '<span style="margin-left:auto;color:var(--err);font-size:.7rem">Your answer</span>' : '') +
+            '</div>';
+          }).join('') +
+        '</div>';
+      }).join('');
+  }
+  const incidentSummary = result.incidents.length
+    ? '<div class="sec">Proctoring Incidents (' + result.incidents.length + ')</div>' +
+      '<div class="tw"><table><thead><tr>' +
+        '<th class="no-sort">Time</th><th class="no-sort">Type</th><th class="no-sort">Detail</th>' +
+      '</tr></thead><tbody>' +
+      result.incidents.map(inc =>
+        '<tr><td>' + esc(inc.time) + '</td><td>' + esc(inc.type) + '</td>' +
+        '<td style="white-space:normal">' + esc(inc.detail) + '</td></tr>').join('') +
+      '</tbody></table></div>'
+    : '';
+  const termNotice = result.terminated
+    ? '<div style="background:rgba(224,82,82,.12);border:1px solid rgba(224,82,82,.4);border-radius:9px;padding:14px;margin-bottom:18px;color:var(--err);font-size:.85rem;font-weight:700;text-align:center">⚠ TERMINATED — anti-cheat threshold reached</div>'
+    : (result.timedOut
+      ? '<div style="background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.35);border-radius:9px;padding:14px;margin-bottom:18px;color:var(--accent);font-size:.85rem;font-weight:700;text-align:center">⏱ Time expired — auto-submitted</div>'
+      : '');
+  $('#result-body').innerHTML =
+    '<div class="crest sm" id="result-crest">🏫</div>' +
+    '<h2 style="text-align:center;font-size:1.25rem;margin-bottom:4px">' + esc(result.studentName) + '</h2>' +
+    '<p style="text-align:center;color:var(--muted);font-size:.82rem">' + esc(result.studentCode) + (result.studentClass ? ' · ' + esc(result.studentClass) : '') + '</p>' +
+    '<p style="text-align:center;color:var(--muted);font-size:.82rem;margin-top:6px">' + esc(result.examTitle) + '</p>' +
+    '<p style="text-align:center;color:var(--muted);font-size:.75rem">Teacher: ' + esc(result.teacherName || '—') + '</p>' +
+    '<p style="text-align:center;color:var(--muted);font-size:.72rem;margin-top:4px">' + esc(fmtDate(result.submittedAt)) + '</p>' +
+    '<div style="display:flex;justify-content:center">' +
+      '<div class="ring ' + (result.passed && !result.terminated ? 'pass' : 'fail') + '" style="background:conic-gradient(' +
+          (result.passed && !result.terminated ? 'var(--ok)' : 'var(--err)') + ' ' + (result.pct * 3.6) + 'deg, #2e3352 0)">' +
+        '<div class="ring-in">' +
+          '<div class="ring-pct">' + result.pct + '%</div>' +
+          '<div class="ring-lbl">Score</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="verdict ' + (result.passed && !result.terminated ? 'p' : 'f') + '" style="text-align:center">' +
+      (result.terminated ? '✗ TERMINATED' : (result.passed ? '✓ PASSED' : '✗ FAILED')) + '</div>' +
+    termNotice +
+    '<div class="rgrid">' +
+      '<div class="rcell"><div class="v" style="color:var(--ok)">' + result.correct + '</div><div class="l">Correct</div></div>' +
+      '<div class="rcell"><div class="v" style="color:var(--err)">' + result.wrong + '</div><div class="l">Wrong</div></div>' +
+      '<div class="rcell"><div class="v" style="color:var(--muted)">' + result.unanswered + '</div><div class="l">Unanswered</div></div>' +
+      '<div class="rcell"><div class="v">' + result.total + '</div><div class="l">Total</div></div>' +
+      '<div class="rcell"><div class="v">' + esc(fmtTime(result.timeUsed)) + '</div><div class="l">Time Used</div></div>' +
+      '<div class="rcell"><div class="v" style="color:' + (result.incidents.length ? 'var(--err)' : 'var(--ok)') + '">' + result.incidents.length + '</div><div class="l">Incidents</div></div>' +
+    '</div>' +
+    '<div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:20px">' +
+      '<button class="btn btn-gold" style="flex:1;min-width:140px;margin:0" data-act="print-slip">🖨 Print Result Slip</button>' +
+      '<button class="btn btn-out" style="flex:1;min-width:140px;margin:0" data-act="result-home">← Back to Exams</button>' +
+    '</div>' +
+    incidentSummary + reviewHtml;
+  crestHTML('result-crest');
+}
+function printSlip() {
+  if (!lastResult) return;
+  const r = lastResult;
+  const s = DB.settings;
+  const logoHtml = s.logo
+    ? '<img src="' + esc(s.logo) + '" alt="School logo">'
+    : '<div class="ps-logo-fb">' + esc((s.schoolName || 'A').trim().charAt(0).toUpperCase()) + '</div>';
+  $('#print-slip').innerHTML =
+    '<div class="ps-head">' + logoHtml +
+      '<h1>' + esc(s.schoolName) + '</h1>' +
+      '<div class="motto">' + esc(s.motto) + '</div>' +
+      (s.address ? '<div class="addr">' + esc(s.address) + '</div>' : '') +
+    '</div>' +
+    '<div class="ps-title">Computer Based Test — Result Slip</div>' +
+    '<table class="ps-table">' +
+      '<tr><td>Student Name</td><td>' + esc(r.studentName) + '</td></tr>' +
+      '<tr><td>Student Code</td><td>' + esc(r.studentCode) + '</td></tr>' +
+      '<tr><td>Class / Level</td><td>' + esc(r.studentClass || '—') + '</td></tr>' +
+      '<tr><td>Examination</td><td>' + esc(r.examTitle) + '</td></tr>' +
+      '<tr><td>Subject</td><td>' + esc(r.subject || '—') + '</td></tr>' +
+      '<tr><td>Teacher</td><td>' + esc(r.teacherName || '—') + '</td></tr>' +
+      '<tr><td>Date &amp; Time</td><td>' + esc(fmtDate(r.submittedAt)) + '</td></tr>' +
+      '<tr><td>Questions Attempted</td><td>' + (r.total - r.unanswered) + ' / ' + r.total + '</td></tr>' +
+      '<tr><td>Time Used</td><td>' + esc(fmtTime(r.timeUsed)) + '</td></tr>' +
+      '<tr><td>Proctoring Incidents</td><td>' + r.incidents.length + '</td></tr>' +
+    '</table>' +
+    '<div class="ps-score">' + r.pct + '%</div>' +
+    '<div class="ps-verdict" style="color:' + (r.passed && !r.terminated ? '#0a7a4d' : '#b02020') + '">' +
+      (r.terminated ? 'TERMINATED' : (r.passed ? 'PASSED' : 'FAILED')) + '</div>' +
+    '<table class="ps-table">' +
+      '<tr><td>Correct Answers</td><td>' + r.correct + '</td></tr>' +
+      '<tr><td>Wrong Answers</td><td>' + r.wrong + '</td></tr>' +
+      '<tr><td>Unanswered</td><td>' + r.unanswered + '</td></tr>' +
+      '<tr><td>Pass Mark</td><td>' + (examById(r.examId) ? examById(r.examId).passScore + '%' : '—') + '</td></tr>' +
+    '</table>' +
+    '<div class="ps-sign">' +
+      '<div><div class="line"></div>Exam Officer' + (s.examOfficer ? '<br>' + esc(s.examOfficer) : '') + '</div>' +
+      '<div><div class="line"></div>Date</div>' +
+    '</div>' +
+    '<div class="ps-foot">Generated by ' + esc(s.schoolName) + ' Computer Based Testing Centre</div>';
+  window.print();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ANTI-CHEAT
+   ═══════════════════════════════════════════════════════════════ */
+const CHEAT_KEYS = new Set(['c','v','x','a','u','p','s','i','j']);
+function onCopy(e)  { e.preventDefault(); e.stopImmediatePropagation(); logIncident('Copy attempt', 'Copying is not allowed.'); }
+function onCut(e)   { e.preventDefault(); e.stopImmediatePropagation(); logIncident('Cut attempt', 'Cutting is not allowed.'); }
+function onPaste(e) { e.preventDefault(); e.stopImmediatePropagation(); logIncident('Paste attempt', 'Pasting is not allowed.'); }
+function onDrag(e)  { e.preventDefault(); logIncident('Drag attempt', 'Dragging is not allowed.'); }
+function onDrop(e)  { e.preventDefault(); logIncident('Drop attempt', 'Dropping is not allowed.'); }
+function onContext(e) { e.preventDefault(); logIncident('Right-click', 'Right-click / context menu is disabled.'); }
+function onSelectStart(e) {
+  const t = e.target;
+  if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
+  e.preventDefault();
+}
+function onKeyDown(e) {
+  const t = e.target;
+  const inField = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA');
+  if (e.key === 'PrintScreen') { logIncident('PrintScreen', 'Screen capture attempts are recorded where the browser supports it.'); return; }
+  if (e.key === 'F12') { e.preventDefault(); logIncident('DevTools', 'Developer tools shortcut is disabled.'); return; }
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
+    const k = (e.key || '').toLowerCase();
+    if (k === 'i' || k === 'j' || k === 'c') { e.preventDefault(); logIncident('DevTools', 'Developer tools shortcut is disabled.'); return; }
+  }
+  if (e.ctrlKey || e.metaKey) {
+    const k = (e.key || '').toLowerCase();
+    if (CHEAT_KEYS.has(k)) {
+      void inField;
+      e.preventDefault();
+      logIncident('Shortcut blocked', 'Ctrl/Cmd + ' + k.toUpperCase() + ' is disabled during the exam.');
+      return;
+    }
+  }
+}
+function onVisibilityChange() { if (document.hidden) logFocusIncident('Tab switch', 'Switching away from the exam window is not allowed.'); }
+function onWindowBlur() { logFocusIncident('Window blur', 'Leaving the exam window is not allowed.'); }
+function logFocusIncident(type, detail) {
+  const now = Date.now();
+  if (now - lastFocusIncident < 900) return;
+  lastFocusIncident = now;
+  logIncident(type, detail);
+}
+function onResize() {
+  if (!initialWidth) return;
+  const w = window.innerWidth;
+  if (w < initialWidth * 0.7 && w < 500) logIncident('Window resize', 'The exam window was resized significantly (possible split-screen).');
+}
+function onFullscreenChange() {
+  if (!document.fullscreenElement && S && !S.submitted) logIncident('Fullscreen exit', 'You left fullscreen mode. Please return to fullscreen.');
+}
+function attachAntiCheat() {
+  if (cheatAttached) return;
+  cheatAttached = true;
+  lastFocusIncident = 0;
+  document.addEventListener('copy', onCopy, true);
+  document.addEventListener('cut', onCut, true);
+  document.addEventListener('paste', onPaste, true);
+  document.addEventListener('dragstart', onDrag, true);
+  document.addEventListener('drop', onDrop, true);
+  document.addEventListener('contextmenu', onContext, true);
+  document.addEventListener('selectstart', onSelectStart, true);
+  document.addEventListener('keydown', onKeyDown, true);
+  document.addEventListener('visibilitychange', onVisibilityChange);
+  window.addEventListener('blur', onWindowBlur);
+  window.addEventListener('resize', onResize);
+  document.addEventListener('fullscreenchange', onFullscreenChange);
+  const b = document.getElementById('scr-exam');
+  if (b) { b.style.userSelect = 'none'; b.style.webkitUserSelect = 'none'; }
+}
+function detachAntiCheat() {
+  if (!cheatAttached) return;
+  cheatAttached = false;
+  document.removeEventListener('copy', onCopy, true);
+  document.removeEventListener('cut', onCut, true);
+  document.removeEventListener('paste', onPaste, true);
+  document.removeEventListener('dragstart', onDrag, true);
+  document.removeEventListener('drop', onDrop, true);
+  document.removeEventListener('contextmenu', onContext, true);
+  document.removeEventListener('selectstart', onSelectStart, true);
+  document.removeEventListener('keydown', onKeyDown, true);
+  document.removeEventListener('visibilitychange', onVisibilityChange);
+  window.removeEventListener('blur', onWindowBlur);
+  window.removeEventListener('resize', onResize);
+  document.removeEventListener('fullscreenchange', onFullscreenChange);
+  const b = document.getElementById('scr-exam');
+  if (b) { b.style.userSelect = ''; b.style.webkitUserSelect = ''; }
+  $('#incident').classList.remove('on');
+}
+let firstIncidentShown = false;
+function logIncident(type, detail) {
+  if (!S || S.submitted) return;
+  if (!DB.settings.strictAntiCheat) return;
+  const now = new Date();
+  S.incidents.push({ time: now.toLocaleTimeString('en-GB'), type, detail, at: Date.now() });
+  Store.saveSession(S);
+  const overlay = $('#incident');
+  $('#incident-msg').textContent = detail;
+  $('#incident-count').textContent = 'Incident ' + S.incidents.length + ' of ' + DB.settings.incidentThreshold + ' — the exam clock keeps running.';
+  overlay.classList.add('on');
+  if (!firstIncidentShown) {
+    firstIncidentShown = true;
+    toast('Proctoring is active. Your activity is being recorded.', 'warn');
+  }
+  if (S.incidents.length >= DB.settings.incidentThreshold) {
+    S.terminated = true;
+    setTimeout(() => { overlay.classList.remove('on'); submitExam(false); }, 1200);
+  }
+}
+function requestFullscreenSafe() {
+  const el = document.documentElement;
+  if (!el.requestFullscreen) return;
+  el.requestFullscreen().catch(() => {});
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESUME
+   ═══════════════════════════════════════════════════════════════ */
+async function offerResume() {
+  const s = await Store.getSession();
+  if (!s || !s.examId || s.submitted) return;
+  const ex = examById(s.examId);
+  if (!ex) { await Store.clearSession(); return; }
+  const now = Date.now();
+  if (ex.windowEnd && now > ex.windowEnd) { await Store.clearSession(); return; }
+  const elapsed = now - s.startedAt;
+  const remain = Math.max(0, Math.ceil((s.durationMs - elapsed) / 1000));
+  openModal(
+    '<h2>Resume Exam?</h2>' +
+    '<p class="modal-sub">An unfinished exam was found for <strong>' + esc(s.studentName) + '</strong> (' + esc(s.studentCode) + ').<br><br>' +
+      '<strong>' + esc(ex.title) + '</strong><br>Time remaining: <strong>' + fmtClock(remain) + '</strong><br>' +
+      'Answered: ' + Object.keys(s.answers).length + ' of ' + s.qOrder.length + '</p>' +
+    '<div class="mfoot">' +
+      '<button class="sbtn sbtn-red" id="rs-discard">Discard</button>' +
+      '<button class="sbtn sbtn-gold" id="rs-resume">Resume Exam</button>' +
+    '</div>',
+    bg => {
+      bg.querySelector('#rs-discard').addEventListener('click', async () => {
+        await Store.clearSession();
+        closeModal(bg);
+        toast('Saved session discarded.', 'ok');
+      });
+      bg.querySelector('#rs-resume').addEventListener('click', () => {
+        closeModal(bg);
+        S = s;
+        sessionSubmitted = false;
+        firstIncidentShown = s.incidents && s.incidents.length > 0;
+        showScreen('scr-exam');
+        renderExamShell();
+        renderQuestion();
+        startTimer();
+        if (DB.settings.strictAntiCheat) { attachAntiCheat(); requestFullscreenSafe(); }
+        initialWidth = window.innerWidth;
+        toast('Exam resumed.', 'ok');
+      });
+    }
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ACTIONS
+   ═══════════════════════════════════════════════════════════════ */
+const ACTIONS = {
+  'go-land': () => showScreen('scr-land'),
+  'go-login': () => { $('#li-err').classList.remove('show'); showScreen('scr-login'); },
+  'go-student': () => openStudentPicker(),
+  'logout': async () => {
+    await clearSession();
+    dashTab = null;
+    detachAntiCheat();
+    showScreen('scr-land');
+    toast('Signed out.', 'ok');
+  },
+  'tab': (el) => { dashTab = el.dataset.tab; renderDash(); },
+  'new-exam': () => openExamEditor(null),
+  'open-settings': () => { dashTab = 'settings'; renderDash(); },
+
+  'add-teacher': () => teacherForm(null),
+  'edit-teacher': (el) => { const t = DB.users.find(u => u.id === el.dataset.id); if (t) teacherForm(t); },
+  'reset-teacher': (el) => { const t = DB.users.find(u => u.id === el.dataset.id); if (t) resetTeacherPassword(t); },
+  'toggle-teacher': async (el) => {
+    const t = DB.users.find(u => u.id === el.dataset.id);
+    if (!t) return;
+    const upd = Object.assign({}, t, { active: !t.active });
+    await Store.saveTeacher(upd);
+    renderDashBody();
+    toast(upd.active ? 'Teacher activated.' : 'Teacher suspended.', 'ok');
+  },
+  'del-teacher': async (el) => {
+    const t = DB.users.find(u => u.id === el.dataset.id);
+    if (!t) return;
+    const ok = await confirmDialog('Delete Teacher?',
+      'This will permanently delete <strong>' + esc(t.name) + '</strong> and all of their exams and results.', 'Delete', true);
+    if (!ok) return;
+    const exams = (await Store.getExams()).filter(e => e.teacherId === t.id);
+    for (const ex of exams) await Store.deleteExam(ex.id);
+    const rs = await Store.getResultsByTeacher(t.id);
+    for (const r of rs) await Store.deleteResult(r.id);
+    await Store.deleteTeacher(t.id);
+    renderDashBody();
+    toast('Teacher deleted.', 'ok');
+  },
+
+  'add-student': () => studentForm(null),
+  'edit-student': (el) => { const s = DB.students.find(x => x.code === el.dataset.code); if (s) studentForm(s); },
+  'bulk-students': () => bulkImportStudents(),
+  'view-student': async (el) => { const s = await Store.getStudent(el.dataset.code); viewStudentHistory(s); },
+  'del-student': async (el) => {
+    const code = el.dataset.code;
+    const s = await Store.getStudent(code);
+    if (!s) return;
+    const ok = await confirmDialog('Delete Student?',
+      'Remove <strong>' + esc(s.name) + '</strong> (' + esc(s.code) + ') from the registry?', 'Delete', true);
+    if (!ok) return;
+    await Store.deleteStudent(code);
+    renderStudents();
+    toast('Student deleted.', 'ok');
+  },
+  'export-students': () => {
+    const rows = [['Name', 'Code', 'Class', 'Email', 'Registered']];
+    DB.students.forEach(s => rows.push([s.name, s.code, s.klass || '', s.email || '', fmtDate(s.createdAt)]));
+    downloadCSV('student-registry-' + new Date().toISOString().slice(0, 10) + '.csv', rows);
+    toast('Registry exported.', 'ok');
+  },
+
+  'edit-exam': (el) => openExamEditor(el.dataset.id),
+  'exam-answers': (el) => openAnswerKey(el.dataset.id),
+  'exam-status': (el) => { const ex = DB.exams.find(e => e.id === el.dataset.id); if (ex) examStatusToggle(ex); },
+  'del-exam': async (el) => {
+    const ex = DB.exams.find(e => e.id === el.dataset.id);
+    if (!ex) return;
+    const ok = await confirmDialog('Delete Exam?',
+      'Permanently delete <strong>' + esc(ex.title) + '</strong> and all of its results?', 'Delete', true);
+    if (!ok) return;
+    await Store.deleteExam(ex.id);
+    renderExams();
+    toast('Exam deleted.', 'ok');
+  },
+
+  'edit-back': async () => {
+    const ok = await confirmDialog('Discard Changes?', 'Any unsaved changes will be lost.', 'Discard', true);
+    if (!ok) return;
+    editingExam = null;
+    showScreen('scr-dash');
+    renderDash();
+  },
+  'edit-save': () => saveExam(),
+  'preset-dur': (el) => {
+    const v = el.dataset.min;
+    $('#ex-dur').value = v;
+    editingExam.durationMinutes = parseInt(v);
+  },
+  'q-add': () => questionEditor(-1),
+  'q-bulk': () => bulkPasteDialog(),
+  'q-file': () => fileImportDialog(),
+  'q-bank': () => openBank(),
+  'q-save-bank': () => saveAllToBank(),
+  'q-edit': (el) => questionEditor(parseInt(el.dataset.idx)),
+  'q-del': async (el) => {
+    const i = parseInt(el.dataset.idx);
+    const ok = await confirmDialog('Delete Question?', 'Remove question ' + (i + 1) + ' from this exam?', 'Delete', true);
+    if (!ok) return;
+    editingExam.questions.splice(i, 1);
+    renderExamEditor();
+  },
+  'q-up': (el) => {
+    const i = parseInt(el.dataset.idx);
+    const t = editingExam.questions[i - 1];
+    editingExam.questions[i - 1] = editingExam.questions[i];
+    editingExam.questions[i] = t;
+    renderExamEditor();
+  },
+  'q-down': (el) => {
+    const i = parseInt(el.dataset.idx);
+    const t = editingExam.questions[i + 1];
+    editingExam.questions[i + 1] = editingExam.questions[i];
+    editingExam.questions[i] = t;
+    renderExamEditor();
+  },
+
+  'res-clear': () => {
+    resFilters = { examId:'', teacherId:'', klass:'', verdict:'', from:'', to:'', q:'' };
+    resPage = 1;
+    renderResults();
+  },
+  'res-export': () => exportResultsCSV(),
+  'res-page': (el) => {
+    const p = parseInt(el.dataset.page);
+    if (p >= 1) { resPage = p; renderResults(); }
+  },
+  'view-result': (el) => {
+    const r = DB.results.find(x => x.id === el.dataset.id);
+    if (!r) return;
+    renderResult(r, null);
+    showScreen('scr-result');
+  },
+  'del-result': async (el) => {
+    const r = DB.results.find(x => x.id === el.dataset.id);
+    if (!r) return;
+    const ok = await confirmDialog('Delete Result?',
+      'Permanently delete the result for <strong>' + esc(r.studentName) + '</strong> on <strong>' + esc(r.examTitle) + '</strong>?', 'Delete', true);
+    if (!ok) return;
+    await Store.deleteResult(r.id);
+    renderResults();
+    toast('Result deleted.', 'ok');
+  },
+
+  'remove-logo': async () => {
+    const ok = await confirmDialog('Remove Logo?', 'The school logo will be replaced with a default crest.', 'Remove', true);
+    if (!ok) return;
+    await Store.saveSettings({ logo: '' });
+    applySettings();
+    renderSettings();
+    toast('Logo removed.', 'ok');
+  },
+  'export-all': () => {
+    const rows = [[
+      'Student','Code','Class','Exam','Subject','Teacher',
+      'Score %','Correct','Wrong','Unanswered','Total',
+      'Result','Terminated','Incidents','Time Used','Date'
+    ]];
+    DB.results.forEach(r => rows.push([
+      r.studentName, r.studentCode, r.studentClass || '', r.examTitle, r.subject || '',
+      r.teacherName || '', r.pct, r.correct, r.wrong, r.unanswered, r.total,
+      r.terminated ? 'TERMINATED' : (r.passed ? 'PASS' : 'FAIL'),
+      r.terminated ? 'Yes' : 'No',
+      (r.incidents || []).length, fmtTime(r.timeUsed || 0), fmtDate(r.submittedAt)
+    ]));
+    downloadCSV('all-results-' + new Date().toISOString().slice(0, 10) + '.csv', rows);
+    toast('Exported ' + DB.results.length + ' result(s).', 'ok');
+  },
+  'clear-db': () => clearDatabaseDialog(),
+
+  'pick-exam': (el) => openBriefing(el.dataset.id),
+  'brief-back': () => { renderStudentPicker(); showScreen('scr-pick'); },
+  'pick-opt': (el) => pickOption(el.dataset.oid),
+  'jump-q': (el) => jumpQuestion(parseInt(el.dataset.idx)),
+  'flag-q': () => toggleFlag(),
+  'ex-prev': () => jumpQuestion(S ? S.currentIndex - 1 : 0),
+  'ex-next': () => jumpQuestion(S ? S.currentIndex + 1 : 0),
+  'ex-submit': () => confirmSubmit(),
+  'incident-dismiss': () => $('#incident').classList.remove('on'),
+
+  'print-slip': () => printSlip(),
+  'result-home': () => { renderStudentPicker(); showScreen('scr-pick'); }
+};
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]');
+  if (!el) return;
+  const fn = ACTIONS[el.dataset.act];
+  if (fn) { e.preventDefault(); fn(el); }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { if (closeTopModal()) e.preventDefault(); }
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   CLEAR DATABASE
+   ═══════════════════════════════════════════════════════════════ */
+function clearDatabaseDialog() {
+  openModal(
+    '<h2 style="color:var(--err)">⚠ Clear Entire Database</h2>' +
+    '<p class="modal-sub">This will permanently delete <strong>all exams, results, students, teachers and settings</strong> from BOTH this device AND the Firestore cloud. This cannot be undone.<br><br>Type <strong>DELETE</strong> below to confirm.</p>' +
+    '<input id="cd-input" type="text" maxlength="10" autocapitalize="characters" placeholder="DELETE" style="text-transform:uppercase">' +
+    '<p class="err" id="cd-err"></p>' +
+    '<div class="mfoot">' +
+      '<button class="sbtn" data-cancel>Cancel</button>' +
+      '<button class="sbtn sbtn-red" id="cd-go">Delete Everything</button>' +
+    '</div>',
+    bg => {
+      bg.querySelector('[data-cancel]').addEventListener('click', () => closeModal(bg));
+      bg.querySelector('#cd-go').addEventListener('click', async () => {
+        const v = bg.querySelector('#cd-input').value.trim().toUpperCase();
+        const err = bg.querySelector('#cd-err');
+        if (v !== 'DELETE') { err.textContent = 'Type DELETE exactly to confirm.'; err.classList.add('show'); return; }
+        await Store.resetAll();
+        await seedAdmin();
+        applySettings();
+        await clearSession();
+        dashTab = null;
+        closeModal(bg);
+        showScreen('scr-land');
+        toast('Database cleared. Default admin restored.', 'ok');
+      });
+    }
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BOOT
+   ═══════════════════════════════════════════════════════════════ */
+async function boot() {
+  await Store.init();
+  await seedAdmin();
+  applySettings();
+
+  $('#login-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const u = $('#li-user').value;
+    const p = $('#li-pass').value;
+    const err = $('#li-err');
+    err.classList.remove('show');
+    const res = await tryLogin(u, p);
+    if (!res.ok) { err.textContent = res.msg; err.classList.add('show'); return; }
+    await setSession(res.user);
+    $('#li-pass').value = '';
+    dashTab = null;
+    if (res.user.mustChange) {
+      renderDash();
+      showScreen('scr-dash');
+      forcePasswordChange();
+    } else {
+      renderDash();
+      showScreen('scr-dash');
+      toast('Welcome, ' + (res.user.name || res.user.username) + '.', 'ok');
+    }
+  });
+
+  const restored = await restoreSession();
+  if (restored) {
+    dashTab = null;
+    renderDash();
+    showScreen('scr-dash');
+    setTimeout(offerResume, 400);
+  } else {
+    renderLanding();
+    showScreen('scr-land');
+    setTimeout(offerResume, 400);
+  }
+  window.addEventListener('beforeunload', () => {
+    if (S && !S.submitted) Store.saveSession(S);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   STORE → UI BRIDGE
+   When Firestore pushes new data (from another device, another tab,
+   or after a reconnect) the Store fires onStoreChange. We refresh
+   whichever screen is currently visible — but NEVER the exam screen,
+   so a mid-exam student isn't interrupted.
+   ═══════════════════════════════════════════════════════════════ */
+window.onStoreChange = function (what) {
+  try {
+    // Skip the exam screen entirely — the student's session is sacred.
+    if (document.getElementById('scr-exam').classList.contains('active')) return;
+
+    // Dashboard — re-render current tab
+    if (document.getElementById('scr-dash').classList.contains('active') && CURRENT_USER) {
+      renderDashBody();
+    }
+
+    // Student exam picker
+    if (document.getElementById('scr-pick').classList.contains('active')) {
+      renderStudentPicker();
+    }
+
+    // Always refresh logo and school name on any change
+    renderLanding();
+  } catch (e) { /* never let a render error crash the sync loop */ }
+};
+
+document.addEventListener('DOMContentLoaded', boot);
+</script>
+</body>
+</html>
